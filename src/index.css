@@ -13,10 +13,48 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-/* AI asistanının "yazıyor..." göstergesi için dönme animasyonu (bkz. AiAssistant.tsx) */
+/* AI asistanı için animasyonlar (bkz. AiAssistant.tsx) */
 @keyframes ai-spin {
   to { transform: rotate(360deg); }
 }
 .ai-spin {
   animation: ai-spin 0.8s linear infinite;
+}
+
+/* Kapalıyken açma butonunun etrafında dikkat çeken nabız halkası */
+@keyframes ai-pulse-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.ai-pulse-ring {
+  animation: ai-pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Panelin ışıltılı, yavaşça kayan degrade kenarlığı */
+@keyframes ai-border-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.ai-border-shimmer {
+  background-size: 300% 300%;
+  animation: ai-border-shimmer 6s ease infinite;
+}
+
+/* "Yazıyor..." göstergesi için sıçrayan üç nokta */
+@keyframes ai-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.ai-bounce {
+  animation: ai-bounce 1.1s ease-in-out infinite;
+}
+
+/* Yeni sohbet balonlarının belirme animasyonu */
+@keyframes ai-msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ai-msg-in {
+  animation: ai-msg-in 0.3s ease-out both;
 }
