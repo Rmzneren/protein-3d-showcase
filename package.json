@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.98",
     "cls": "^0.1.5",
     "gsap": "^3.15.0",
     "lucide-react": "^1.31.0",

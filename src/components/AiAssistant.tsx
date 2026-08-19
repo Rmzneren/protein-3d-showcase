@@ -3,6 +3,7 @@ import type { MouseEvent } from 'react'
 import gsap from 'gsap'
 import { Bot, Send, Sparkles, X } from 'lucide-react'
 import { srOnlyStyle } from '../utils/a11y'
+import { SplineRobot } from './SplineRobot'
 
 // Sitede her sayfada görünen, sağ altta sabit duran AI beslenme asistanı.
 // /api/chat (Vercel serverless function) üzerinden Claude'a bağlanır; API anahtarı
@@ -196,17 +197,13 @@ export function AiAssistant() {
                             }}
                         />
 
-                        {/* Başlık */}
-                        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '10px', padding: '18px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                            <div style={{ position: 'relative', width: '34px', height: '34px', flexShrink: 0 }}>
-                                <span aria-hidden="true" className="ai-pulse-ring" style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: BRAND_COLOR, pointerEvents: 'none' }} />
-                                <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,87,34,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Sparkles size={18} color={BRAND_COLOR} />
-                                </div>
-                            </div>
-                            <div>
-                                <div id={dialogTitleId} style={{ color: '#fff', fontWeight: 800, fontSize: '14px' }}>AI Beslenme Asistanı</div>
-                                <div style={{ color: '#888', fontSize: '11px' }}>PROTEIN3D · her zaman çevrimiçi</div>
+                        {/* Robot sahnesi + başlık — panel her açıldığında interaktif 3D robot canlanır */}
+                        <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '148px', flexShrink: 0, background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                            <SplineRobot />
+                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, #050505 0%, transparent 55%)', pointerEvents: 'none' }} />
+                            <div style={{ position: 'absolute', bottom: '10px', left: '16px', pointerEvents: 'none' }}>
+                                <div id={dialogTitleId} style={{ color: '#fff', fontWeight: 800, fontSize: '14px', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>AI Beslenme Asistanı</div>
+                                <div style={{ color: '#ddd', fontSize: '11px', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>PROTEIN3D · her zaman çevrimiçi</div>
                             </div>
                         </div>
 
