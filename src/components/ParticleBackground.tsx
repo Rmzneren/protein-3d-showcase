@@ -4,13 +4,9 @@ interface ParticleBackgroundProps {
     color: string
     rgba: string
     activeIdx: number
-    // true iken parçacıklar hareket etmez, tek bir statik kare çizilir
-    // (prefers-reduced-motion desteği — sürekli arkaplan animasyonu vestibüler
-    // rahatsızlığa yol açabileceği için kullanıcı tercihine saygı gösterilir)
-    reducedMotion?: boolean
 }
 
-export function ParticleBackground({ color, reducedMotion = false }: ParticleBackgroundProps) {
+export function ParticleBackground({ color }: ParticleBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
@@ -41,18 +37,9 @@ export function ParticleBackground({ color, reducedMotion = false }: ParticleBac
             })
         }
 
-        const drawFrame = () => {
-            ctx.clearRect(0, 0, width, height)
-            particles.forEach((p) => {
-                ctx.beginPath()
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-                ctx.fillStyle = color
-                ctx.globalAlpha = 0.3
-                ctx.fill()
-            })
-        }
-
         const render = () => {
+            ctx.clearRect(0, 0, width, height)
+            ctx.fillStyle = color
             particles.forEach((p) => {
                 p.x += p.speedX
                 p.y += p.speedY
@@ -60,23 +47,23 @@ export function ParticleBackground({ color, reducedMotion = false }: ParticleBac
                 if (p.x > width) p.x = 0
                 if (p.y < 0) p.y = height
                 if (p.y > height) p.y = 0
+
+                ctx.beginPath()
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+                ctx.fillStyle = color
+                ctx.globalAlpha = 0.3
+                ctx.fill()
             })
-            drawFrame()
             animationFrameId = requestAnimationFrame(render)
         }
 
-        // Hareketi azalt tercihinde tek statik kare çizilir, requestAnimationFrame döngüsü hiç başlamaz
-        if (reducedMotion) {
-            drawFrame()
-        } else {
-            render()
-        }
+        render()
 
         return () => {
             window.removeEventListener('resize', handleResize)
             cancelAnimationFrame(animationFrameId)
         }
-    }, [color, reducedMotion])
+    }, [color])
 
     return (
         <canvas

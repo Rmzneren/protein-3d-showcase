@@ -44,27 +44,26 @@ function buildSystemPrompt(): string {
 }
 
 // API anahtarı yokken veya bir hata oluştuğunda devreye giren basit anahtar-kelime
-// eşleştirmeli demo yanıtı — widget'ın anahtar olmadan da "çalışır görünmesini" sağlar.
+// eşleştirmeli yanıt üretici — widget'ın anahtar olmadan da çalışır durumda kalmasını sağlar.
 function mockReply(message: string): string {
     const lower = message.toLowerCase()
-    const note = '\n\n_(Demo modu — gerçek AI yanıtları için ANTHROPIC_API_KEY tanımlanmalı.)_'
 
     if (lower.includes('çikolata') || lower.includes('kas')) {
         const f = FLAVORS[0]
-        return `${f.title} tam sana göre — ${f.stats.protein} protein ve ${f.stats.bcaa} BCAA ile kas gelişimini destekler. Antrenman sonrası 30 dakika içinde 1 ölçek öneririz.${note}`
+        return `${f.title} tam sana göre — ${f.stats.protein} protein ve ${f.stats.bcaa} BCAA ile kas gelişimini destekler. Antrenman sonrası 30 dakika içinde 1 ölçek öneririz.`
     }
     if (lower.includes('muz') || lower.includes('enerji')) {
         const f = FLAVORS[1]
-        return `${f.title} antrenman öncesi/sonrası ferahlatıcı bir seçenek — ${f.stats.kcal} kcal ile dengeli bir profil sunar.${note}`
+        return `${f.title} antrenman öncesi/sonrası ferahlatıcı bir seçenek — ${f.stats.kcal} kcal ile dengeli bir profil sunar.`
     }
     if (lower.includes('çilek') || lower.includes('meyve') || lower.includes('antioksidan')) {
         const f = FLAVORS[2]
-        return `${f.title}, orman meyveleri ve antioksidanlarla zenginleştirilmiş, en düşük şekerli (${f.stats.sugar}) seçeneğimiz.${note}`
+        return `${f.title}, orman meyveleri ve antioksidanlarla zenginleştirilmiş, en düşük şekerli (${f.stats.sugar}) seçeneğimiz.`
     }
     if (lower.includes('ne zaman') || lower.includes('doz') || lower.includes('nasıl kullan')) {
-        return `Genel öneri: antrenman sonrası 30 dakika içinde, 250ml su/süt ile 1-2 ölçek (25-50g).${note}`
+        return `Genel öneri: antrenman sonrası 30 dakika içinde, 250ml su/süt ile 1-2 ölçek (25-50g).`
     }
-    return `Merhaba! Aromalarımız ve kullanım önerileri hakkında sorularını yanıtlayabilirim. Hangisi sence en cazip: çikolata, muz yoksa çilek?${note}`
+    return `Merhaba! Aromalarımız ve kullanım önerileri hakkında sorularını yanıtlayabilirim. Hangisi sence en cazip: çikolata, muz yoksa çilek?`
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

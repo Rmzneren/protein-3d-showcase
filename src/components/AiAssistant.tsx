@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { Bot, Loader2, Send, Sparkles, X } from 'lucide-react'
 import { srOnlyStyle } from '../utils/a11y'
-import { usePrefersReducedMotion } from '../hooks/useReducedMotion'
 
 // Sitede her sayfada görünen, sağ altta sabit duran AI beslenme asistanı.
 // /api/chat (Vercel serverless function) üzerinden Claude'a bağlanır; API anahtarı
@@ -34,26 +33,25 @@ export function AiAssistant() {
     const inputRef = useRef<HTMLInputElement>(null)
     const panelRef = useRef<HTMLDivElement>(null)
     const scrollRef = useRef<HTMLDivElement>(null)
-    const prefersReducedMotion = usePrefersReducedMotion()
     const dialogTitleId = useId()
 
     // Panel açılınca odağı input'a taşı, GSAP ile hafif bir giriş animasyonu oynat
     useEffect(() => {
         if (!isOpen) return
         inputRef.current?.focus()
-        if (!prefersReducedMotion && panelRef.current) {
+        if (panelRef.current) {
             gsap.fromTo(
                 panelRef.current,
                 { opacity: 0, y: 16, scale: 0.96 },
                 { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: 'back.out(1.4)' }
             )
         }
-    }, [isOpen, prefersReducedMotion])
+    }, [isOpen])
 
     // Yeni mesaj geldiğinde sohbet alanını en alta kaydır
     useEffect(() => {
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
-    }, [messages, isLoading, prefersReducedMotion])
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    }, [messages, isLoading])
 
     // Panel açıkken Escape ile kapat, kapanınca odağı tetikleyen butona geri ver
     useEffect(() => {
@@ -172,7 +170,7 @@ export function AiAssistant() {
                         ))}
                         {isLoading && (
                             <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '8px', color: '#888', fontSize: '12px', padding: '4px 6px' }}>
-                                <Loader2 size={14} className={prefersReducedMotion ? undefined : 'ai-spin'} aria-hidden="true" />
+                                <Loader2 size={14} className="ai-spin" aria-hidden="true" />
                                 yazıyor…
                             </div>
                         )}

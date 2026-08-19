@@ -5,7 +5,6 @@ import { FLAVORS } from '../data/flavors'
 import { ParticleBackground } from '../components/ParticleBackground'
 import { BurstCanvas } from '../components/BurstCanvas'
 import type { BurstCanvasRef } from '../components/BurstCanvas'
-import { usePrefersReducedMotion } from '../hooks/useReducedMotion'
 import { srOnlyStyle } from '../utils/a11y'
 
 // Güven bandında gösterilen rakamlar — pazarlama içeriği, veritabanından gelmiyor.
@@ -56,14 +55,7 @@ export function HomePage(_props: HomePageProps) {
     const detailsButtonRef = useRef<HTMLButtonElement>(null)
     const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-    // "Hareketi azalt" tercihi: custom cursor kapanır (native cursor geri gelir)
-    // ve tüm GSAP animasyonları anlık hale getirilir (sürekli tekrar eden efektler dahil).
-    const prefersReducedMotion = usePrefersReducedMotion()
-    const cursorStyle = prefersReducedMotion ? 'auto' : 'none'
-
-    useEffect(() => {
-        gsap.globalTimeline.timeScale(prefersReducedMotion ? 30 : 1)
-    }, [prefersReducedMotion])
+    const cursorStyle = 'none'
 
     // Carousel kartları responsive boyutlandığı için kayma mesafesi ekrandan ekrana
     // değişir — gerçek render edilmiş genişlik + boşluktan canlı ölçülüyor.
@@ -83,9 +75,6 @@ export function HomePage(_props: HomePageProps) {
     // ÖZEL İMLEÇ (CUSTOM CURSOR)
     // ==========================================================
     useEffect(() => {
-        // Hareketi azalt tercihi açıksa özel imleci hiç etkinleştirme — native cursor kullanılır
-        if (prefersReducedMotion) return
-
         const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.15, ease: "power3" })
         const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.15, ease: "power3" })
 
@@ -96,7 +85,7 @@ export function HomePage(_props: HomePageProps) {
         window.addEventListener("mousemove", moveCursor)
 
         return () => window.removeEventListener("mousemove", moveCursor)
-    }, [prefersReducedMotion])
+    }, [])
 
     // ==========================================================
     // CAROUSEL ADIM MESAFESİNİ ÖLÇME (responsive)
@@ -382,19 +371,17 @@ export function HomePage(_props: HomePageProps) {
     return (
         <div style={{ background: '#030303', width: '100%', minHeight: '100%', position: 'relative' }}>
 
-            {/* Özel İmleç — hareketi azalt tercihinde hiç render edilmez, native cursor kullanılır */}
-            {!prefersReducedMotion && (
-                <div
-                    ref={cursorRef}
-                    aria-hidden="true"
-                    style={{
-                        position: 'fixed', top: 0, left: 0, width: '16px', height: '16px',
-                        backgroundColor: current.color, borderRadius: '50%', pointerEvents: 'none',
-                        zIndex: 9999, transform: 'translate(-50%, -50%)', mixBlendMode: 'screen',
-                        boxShadow: `0 0 15px ${current.rgba}`
-                    }}
-                />
-            )}
+            {/* Özel İmleç */}
+            <div
+                ref={cursorRef}
+                aria-hidden="true"
+                style={{
+                    position: 'fixed', top: 0, left: 0, width: '16px', height: '16px',
+                    backgroundColor: current.color, borderRadius: '50%', pointerEvents: 'none',
+                    zIndex: 9999, transform: 'translate(-50%, -50%)', mixBlendMode: 'screen',
+                    boxShadow: `0 0 15px ${current.rgba}`
+                }}
+            />
 
             {/* --- ANA HERO (CAROUSEL) --- */}
             <div
@@ -408,7 +395,7 @@ export function HomePage(_props: HomePageProps) {
                 }}
             >
                 <BurstCanvas ref={burstRef} />
-                <ParticleBackground color={current.color} rgba={current.rgba} activeIdx={activeIdx} reducedMotion={prefersReducedMotion} />
+                <ParticleBackground color={current.color} rgba={current.rgba} activeIdx={activeIdx} />
 
                 {/* Çevresel Efektler (Environment Modifiers) */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 1, opacity: 0.6 }}>
