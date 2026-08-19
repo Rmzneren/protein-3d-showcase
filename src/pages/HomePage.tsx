@@ -4,7 +4,8 @@ import { Sparkles, X, Users, Award, Leaf, Star, CupSoda, Timer, TrendingUp } fro
 import { FLAVORS } from '../data/flavors'
 import { ParticleBackground } from '../components/ParticleBackground'
 import { BurstCanvas } from '../components/BurstCanvas'
-import { LiquidBackground } from '../components/LiquidBackground'
+import { LiquidDripCanvas } from '../components/LiquidDripCanvas'
+import type { LiquidDripCanvasRef } from '../components/LiquidDripCanvas'
 import type { BurstCanvasRef } from '../components/BurstCanvas'
 import { srOnlyStyle } from '../utils/a11y'
 import { revealOnScroll, onEnterView } from '../utils/scrollReveal'
@@ -51,6 +52,7 @@ export function HomePage(_props: HomePageProps) {
     const infoRef = useRef<HTMLDivElement>(null)
     const capRef = useRef<HTMLDivElement>(null)
     const burstRef = useRef<BurstCanvasRef>(null)
+    const dripRef = useRef<LiquidDripCanvasRef>(null)
     const modalRef = useRef<HTMLDivElement>(null)
     const cursorRef = useRef<HTMLDivElement>(null)
     const carouselViewportRef = useRef<HTMLDivElement>(null)
@@ -420,10 +422,8 @@ export function HomePage(_props: HomePageProps) {
                 }}
             >
                 <BurstCanvas ref={burstRef} />
+                <LiquidDripCanvas ref={dripRef} />
                 <ParticleBackground color={current.color} rgba={current.rgba} activeIdx={activeIdx} />
-
-                {/* Sıvı metal arka plan — seçili aromanın ürün görseli sıvı gibi dağılır (bkz. LiquidBackground.tsx) */}
-                <LiquidBackground imageUrl={current.image} style={{ zIndex: 1 }} />
 
                 {/* Çevresel Efektler (Environment Modifiers) */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 1, opacity: 0.6 }}>
@@ -520,8 +520,15 @@ export function HomePage(_props: HomePageProps) {
                                                 else openProductDetails()
                                             }
                                         }}
-                                        onMouseEnter={enterHover}
-                                        onMouseLeave={leaveHover}
+                                        onMouseEnter={(e) => {
+                                            enterHover()
+                                            const img = e.currentTarget.querySelector('img')
+                                            if (img) dripRef.current?.startDrip(item.id, img.getBoundingClientRect(), item.color, item.rgba)
+                                        }}
+                                        onMouseLeave={() => {
+                                            leaveHover()
+                                            dripRef.current?.stopDrip(item.id)
+                                        }}
                                         style={{
                                             width: 'clamp(200px, 30vw, 360px)', height: 'clamp(260px, 38vw, 440px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative',
                                             transform: isSelected ? 'scale(1.22)' : 'scale(0.72)', opacity: isSelected ? 1 : 0.2, filter: isSelected ? 'none' : 'blur(5px) grayscale(60%)',
