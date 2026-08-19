@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Anthropic from '@anthropic-ai/sdk'
-import { FLAVORS } from '../src/data/flavors'
+import { FLAVORS } from '../src/data/flavors.js'
 
 // ==========================================================
 // PROTEIN3D AI BESLENME ASİSTANI — Vercel Serverless Function
