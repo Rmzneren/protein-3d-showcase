@@ -119,7 +119,7 @@ export function NutritionPage() {
 
                     <div className="hero-reveal" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
                         <img
-                            src="/images/chocolate.png"
+                            src="/images/chocolate.webp"
                             alt="PROTEIN3D ürün şişesi"
                             style={{ height: 'clamp(220px, 30vw, 360px)', objectFit: 'contain', filter: `drop-shadow(0 30px 60px ${BRAND_RGBA})`, position: 'relative', zIndex: 2 }}
                         />
@@ -325,7 +325,7 @@ export function NutritionPage() {
                 {/* --- AROMA ŞERİDİ (kapanış) --- */}
                 <div className="scroll-reveal" style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(16px, 4vw, 40px)', paddingBottom: '100px', flexWrap: 'wrap' }}>
                     {FLAVORS.map((f) => (
-                        <img key={f.id} src={f.image} alt={f.title} style={{ height: '90px', objectFit: 'contain', filter: `drop-shadow(0 10px 20px ${f.rgba})`, opacity: 0.9 }} />
+                        <img key={f.id} src={f.image} alt={f.title} loading="lazy" style={{ height: '90px', objectFit: 'contain', filter: `drop-shadow(0 10px 20px ${f.rgba})`, opacity: 0.9 }} />
                     ))}
                 </div>
             </div>

@@ -29,7 +29,7 @@ This is a single-page marketing/showcase site for a whey protein brand ("PROTEIN
 - **Effects components**: `src/components/ParticleBackground.tsx` (raw `<canvas>` + `requestAnimationFrame` particle field, colored per active flavor) and `src/components/BurstCanvas.tsx` (imperative-handle component exposing `triggerBurst(x, y, color, rgba, emoji)` — spawns transient DOM nodes animated with GSAP for the "burst" effect on product click, including flavor-specific emoji particles via `FLAVOR_EMOJI` in `HomePage.tsx`). Both manage their own animation loops/cleanup in `useEffect`.
 - **Other pages** (`NutritionPage.tsx`, `ContactPage.tsx`) are simpler, mostly-static content pages using a shared "reveal on mount" GSAP fade/stagger pattern (`gsap.fromTo` targeting a `.reveal`/`.anim-item` class in a `useEffect`).
 - **Icons**: `lucide-react` is used throughout for iconography (not custom SVGs, except `public/icons.svg`/`public/favicon.svg`).
-- **Product images**: Flavor images are referenced from `flavors.ts` as `/images/*.png` (public-relative paths), not imported as modules — new flavor images should be dropped in `public/images/`.
+- **Product images**: Flavor images are referenced from `flavors.ts` as `/images/*.webp` (public-relative paths), not imported as modules — new flavor images should be dropped in `public/images/` as `.png` and run through `npm run optimize:images` (uses `sharp`, `scripts/optimize-images.mjs`) to produce compressed `.webp` output before referencing them; the original PNGs from this product photoshoot were ~1.1MB each and are not committed.
 
 ## TypeScript/lint config notes
 

@@ -1,10 +1,31 @@
+import { Suspense, lazy } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import { HomePage } from './pages/HomePage'
-import { ContactPage } from './pages/ContactPage'
-import { NutritionPage } from './pages/NutritionPage'
 import { Footer } from './components/Footer'
 import { AiAssistant } from './components/AiAssistant'
 import { Sparkles, Activity, Mail } from 'lucide-react'
+
+// Rota bazlı kod bölme — her sayfa sadece ziyaret edildiğinde indirilir,
+// ilk yüklemede diğer iki sayfanın kodu hiç indirilmez.
+const HomePage = lazy(() => import('./pages/HomePage').then((m) => ({ default: m.HomePage })))
+const NutritionPage = lazy(() => import('./pages/NutritionPage').then((m) => ({ default: m.NutritionPage })))
+const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })))
+
+// Sayfa geçişlerinde kod indirilirken gösterilen minimal, marka renginde yükleme göstergesi
+function PageFallback() {
+    return (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+            <div style={{ display: 'flex', gap: '6px' }} aria-label="Sayfa yükleniyor" role="status">
+                {[0, 1, 2].map((i) => (
+                    <span
+                        key={i}
+                        className="ai-bounce"
+                        style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#ff5722', animationDelay: `${i * 0.15}s` }}
+                    />
+                ))}
+            </div>
+        </div>
+    )
+}
 
 export function App() {
     const location = useLocation()
@@ -92,11 +113,13 @@ export function App() {
 
             {/* Main Content Area */}
             <main style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Routes>
-                    <Route path="/" element={<HomePage onSelect={() => {}} />} />
-                    <Route path="/nutrition" element={<NutritionPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                </Routes>
+                <Suspense fallback={<PageFallback />}>
+                    <Routes>
+                        <Route path="/" element={<HomePage onSelect={() => {}} />} />
+                        <Route path="/nutrition" element={<NutritionPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                    </Routes>
+                </Suspense>
             </main>
 
             <Footer />

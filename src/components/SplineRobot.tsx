@@ -1,5 +1,7 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import type { CSSProperties } from 'react'
+import { Bot } from 'lucide-react'
+import { shouldLoadHeavy3D } from '../utils/deviceCapability'
 
 // Interaktif 3D robot sahnesi — AI asistan panelinin üst kısmında gösterilir.
 // Spline'ın Runtime'ı ağır olduğu için (WebGL + birkaç MB), lazy() ile sadece
@@ -16,6 +18,20 @@ interface SplineRobotProps {
 }
 
 export function SplineRobot({ style }: SplineRobotProps) {
+    // Yavaş bağlantı / veri tasarrufu / düşük bellekli cihazlarda ~1.5MB'lık
+    // WebGL sahnesini hiç indirmeyip hafif, statik bir rozete düşer.
+    const [canLoad3D] = useState(shouldLoadHeavy3D)
+
+    if (!canLoad3D) {
+        return (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle, rgba(255,87,34,0.18) 0%, transparent 70%)', ...style }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,87,34,0.15)', border: '1px solid rgba(255,87,34,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Bot size={30} color="#ff5722" aria-hidden="true" />
+                </div>
+            </div>
+        )
+    }
+
     return (
         <Suspense
             fallback={
