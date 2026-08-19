@@ -2,7 +2,41 @@ import { Suspense, lazy } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Footer } from './components/Footer'
 import { AiAssistant } from './components/AiAssistant'
-import { Sparkles, Activity, Mail } from 'lucide-react'
+import { CartDrawer } from './components/CartDrawer'
+import { CheckoutModal } from './components/CheckoutModal'
+import { CartProvider } from './context/CartContext'
+import { useCart } from './hooks/useCart'
+import { Sparkles, Activity, Mail, ShoppingBag } from 'lucide-react'
+
+// Navbar'daki sepet butonu — dolu ürün sayısını rozet olarak gösterir
+function CartButton() {
+    const { totalItems, openCart } = useCart()
+    return (
+        <button
+            onClick={openCart}
+            aria-label={totalItems > 0 ? `Sepeti aç, içinde ${totalItems} ürün var` : 'Sepeti aç'}
+            style={{
+                position: 'relative', width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.03)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', flexShrink: 0,
+            }}
+        >
+            <ShoppingBag size={17} />
+            {totalItems > 0 && (
+                <span
+                    aria-hidden="true"
+                    style={{
+                        position: 'absolute', top: '-4px', right: '-4px', minWidth: '18px', height: '18px', borderRadius: '9px',
+                        background: '#ff5722', color: '#fff', fontSize: '10px', fontWeight: 800,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', border: '2px solid #0a0a0a',
+                    }}
+                >
+                    {totalItems}
+                </span>
+            )}
+        </button>
+    )
+}
 
 // Rota bazlı kod bölme — her sayfa sadece ziyaret edildiğinde indirilir,
 // ilk yüklemede diğer iki sayfanın kodu hiç indirilmez.
@@ -32,6 +66,7 @@ export function App() {
     const isActive = (path: string) => location.pathname === path
 
     return (
+        <CartProvider>
         <div style={{ background: '#0a0a0a', minHeight: '100vh', width: '100%', color: '#fff', display: 'flex', flexDirection: 'column' }}>
             {/* Header / Navbar */}
             <header style={{ 
@@ -53,8 +88,9 @@ export function App() {
                     <span>PROTEIN<span style={{ color: '#ff5722' }}>3D</span></span>
                 </div>
 
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <nav style={{ display: 'flex', gap: '10px', background: 'rgba(255,255,255,0.03)', padding: '6px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <Link 
+                    <Link
                         to="/"
                         style={{ 
                             background: isActive('/') ? '#ffffff' : 'transparent', 
@@ -109,6 +145,8 @@ export function App() {
                         <Mail size={14} /> İletişim
                     </Link>
                 </nav>
+                <CartButton />
+                </div>
             </header>
 
             {/* Main Content Area */}
@@ -124,7 +162,10 @@ export function App() {
 
             <Footer />
             <AiAssistant />
+            <CartDrawer />
+            <CheckoutModal />
         </div>
+        </CartProvider>
     )
 }
 

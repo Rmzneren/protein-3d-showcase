@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { Sparkles, X, Users, Award, Leaf, Star, CupSoda, Timer, TrendingUp } from 'lucide-react'
+import { Sparkles, X, Users, Award, Leaf, Star, CupSoda, Timer, TrendingUp, ShoppingBag } from 'lucide-react'
 import { FLAVORS } from '../data/flavors'
+import { useCart } from '../hooks/useCart'
 import { ParticleBackground } from '../components/ParticleBackground'
 import { BurstCanvas } from '../components/BurstCanvas'
 import { LiquidDripCanvas } from '../components/LiquidDripCanvas'
@@ -41,6 +42,7 @@ const FLAVOR_EMOJI: Record<string, string> = {
 }
 
 export function HomePage(_props: HomePageProps) {
+    const { addToCart } = useCart()
     const [activeIdx, setActiveIdx] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
@@ -725,9 +727,24 @@ export function HomePage(_props: HomePageProps) {
                     />
 
                     {/* Modal İçindeki Başlık */}
-                    <h2 id="product-modal-title" className="modal-title" style={{ position: 'absolute', bottom: '8%', fontSize: 'clamp(22px, 4vw, 42px)', fontWeight: 900, color: '#fff', letterSpacing: '4px', textTransform: 'uppercase', textAlign: 'center', padding: '0 16px' }}>
+                    <h2 id="product-modal-title" className="modal-title" style={{ position: 'absolute', bottom: '14%', fontSize: 'clamp(22px, 4vw, 42px)', fontWeight: 900, color: '#fff', letterSpacing: '4px', textTransform: 'uppercase', textAlign: 'center', padding: '0 16px' }}>
                         Formülün Sırrı
                     </h2>
+
+                    {/* Fiyat + Sepete Ekle */}
+                    <div className="modal-title" style={{ position: 'absolute', bottom: '3%', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <span style={{ color: '#fff', fontWeight: 900, fontSize: '20px' }}>{current.price}₺</span>
+                        <button
+                            onClick={() => addToCart(current)}
+                            style={{
+                                padding: '13px 28px', borderRadius: '30px', border: 'none', background: current.color,
+                                color: '#fff', fontWeight: 900, fontSize: '13px', letterSpacing: '1px', cursor: cursorStyle,
+                                display: 'flex', alignItems: 'center', gap: '8px', boxShadow: `0 10px 30px ${current.rgba}`,
+                            }}
+                        >
+                            <ShoppingBag size={16} /> SEPETE EKLE
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

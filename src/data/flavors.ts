@@ -6,6 +6,7 @@ export interface Flavor {
     rgba: string
     image: string
     badge: string
+    price: number // TL — pazarlama/demo amaçlı, gerçek bir ödeme sistemine bağlı değil
     stats: {
         protein: string
         bcaa: string
@@ -23,6 +24,7 @@ export const FLAVORS: Flavor[] = [
         rgba: 'rgba(255, 87, 34, 0.25)',
         image: '/images/chocolate.webp',
         badge: 'BEST SELLER',
+        price: 249,
         stats: { protein: '27g', bcaa: '6.2g', kcal: '118', sugar: '0.5g' }
     },
     {
@@ -33,6 +35,7 @@ export const FLAVORS: Flavor[] = [
         rgba: 'rgba(255, 235, 59, 0.25)',
         image: '/images/banana.webp',
         badge: 'NEW FORMULA',
+        price: 229,
         stats: { protein: '26g', bcaa: '5.8g', kcal: '115', sugar: '0.4g' }
     },
     {
@@ -43,6 +46,7 @@ export const FLAVORS: Flavor[] = [
         rgba: 'rgba(233, 30, 99, 0.25)',
         image: '/images/berry.webp',
         badge: 'ENERGY BOOST',
+        price: 259,
         stats: { protein: '28g', bcaa: '6.5g', kcal: '120', sugar: '0.2g' }
     }
 ]
