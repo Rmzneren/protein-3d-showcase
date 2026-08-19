@@ -19,8 +19,17 @@ export function SplineRobot({ style }: SplineRobotProps) {
     return (
         <Suspense
             fallback={
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', ...style }}>
-                    <span aria-hidden="true" className="ai-bounce" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5722' }} />
+                <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', ...style }}>
+                    <div style={{ display: 'flex', gap: '4px' }} aria-hidden="true">
+                        {[0, 1, 2].map((i) => (
+                            <span
+                                key={i}
+                                className="ai-bounce"
+                                style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#ff5722', animationDelay: `${i * 0.15}s` }}
+                            />
+                        ))}
+                    </div>
+                    <span style={{ color: '#888', fontSize: '11px', letterSpacing: '0.3px' }}>Yapay zeka asistanınız yükleniyor…</span>
                 </div>
             }
         >
