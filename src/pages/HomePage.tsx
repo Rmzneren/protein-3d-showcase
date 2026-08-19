@@ -4,6 +4,7 @@ import { Sparkles, X, Users, Award, Leaf, Star, CupSoda, Timer, TrendingUp } fro
 import { FLAVORS } from '../data/flavors'
 import { ParticleBackground } from '../components/ParticleBackground'
 import { BurstCanvas } from '../components/BurstCanvas'
+import { LiquidBackground } from '../components/LiquidBackground'
 import type { BurstCanvasRef } from '../components/BurstCanvas'
 import { srOnlyStyle } from '../utils/a11y'
 import { revealOnScroll, onEnterView } from '../utils/scrollReveal'
@@ -420,6 +421,9 @@ export function HomePage(_props: HomePageProps) {
             >
                 <BurstCanvas ref={burstRef} />
                 <ParticleBackground color={current.color} rgba={current.rgba} activeIdx={activeIdx} />
+
+                {/* Sıvı metal arka plan — seçili aromanın ürün görseli sıvı gibi dağılır (bkz. LiquidBackground.tsx) */}
+                <LiquidBackground imageUrl={current.image} style={{ zIndex: 1 }} />
 
                 {/* Çevresel Efektler (Environment Modifiers) */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 1, opacity: 0.6 }}>
