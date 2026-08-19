@@ -45,8 +45,20 @@ function buildSystemPrompt(): string {
 
 // API anahtarı yokken veya bir hata oluştuğunda devreye giren basit anahtar-kelime
 // eşleştirmeli yanıt üretici — widget'ın anahtar olmadan da çalışır durumda kalmasını sağlar.
+// Kontroller en spesifikten en genele doğru sıralı: önce net niyet (laktoz, "hangi aroma"
+// gibi kalıplar), sonra tek tek aroma isimleri, en sonda genel karşılama.
 function mockReply(message: string): string {
     const lower = message.toLowerCase()
+
+    // "Laktoz intoleransım var, olur mu?" gibi sorular — en spesifik, en önce kontrol edilmeli
+    if (lower.includes('laktoz') || lower.includes('intoleran')) {
+        return 'Formülümüz mikro-filtrasyon teknolojisiyle üretildiği için laktoz oranı son derece düşük — çoğu laktoz hassasiyeti olan kullanıcı rahatça tüketebiliyor. Yine de hassasiyetin ciddiyse önce doktoruna/diyetisyenine danışmanı öneririm.'
+    }
+
+    // "Hangi aroma bana uygun?" gibi genel öneri istekleri — tek bir aroma adı geçmiyor
+    if (lower.includes('hangi aroma') || lower.includes('hangi tat') || lower.includes('hangisini') || (lower.includes('öner') && !lower.includes('çikolata') && !lower.includes('muz') && !lower.includes('çilek'))) {
+        return `Kas gelişimi ve doygunluk önceliğinse ${FLAVORS[0].title} (en yüksek protein), antrenman öncesi hafif bir enerji istiyorsan ${FLAVORS[1].title}, en düşük şekerli ve antioksidan destekli bir seçenek istiyorsan ${FLAVORS[2].title} tam sana göre. Hangisi kulağına daha hoş geliyor?`
+    }
 
     if (lower.includes('çikolata') || lower.includes('kas')) {
         const f = FLAVORS[0]
@@ -60,10 +72,10 @@ function mockReply(message: string): string {
         const f = FLAVORS[2]
         return `${f.title}, orman meyveleri ve antioksidanlarla zenginleştirilmiş, en düşük şekerli (${f.stats.sugar}) seçeneğimiz.`
     }
-    if (lower.includes('ne zaman') || lower.includes('doz') || lower.includes('nasıl kullan')) {
-        return `Genel öneri: antrenman sonrası 30 dakika içinde, 250ml su/süt ile 1-2 ölçek (25-50g).`
+    if (lower.includes('ne zaman') || lower.includes('doz') || lower.includes('nasıl kullan') || lower.includes('miktar') || lower.includes('kaç ölçek')) {
+        return `Genel öneri: antrenman sonrası 30 dakika içinde, 250ml su/süt ile 1-2 ölçek (25-50g). Gece yatmadan önce de kas onarımını desteklemek için tüketebilirsin.`
     }
-    return `Merhaba! Aromalarımız ve kullanım önerileri hakkında sorularını yanıtlayabilirim. Hangisi sence en cazip: çikolata, muz yoksa çilek?`
+    return `Merhaba! Aromalarımız, dozaj veya laktoz/şeker gibi içerik soruların hakkında yardımcı olabilirim. Hangisi sence en cazip: çikolata, muz yoksa çilek?`
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
