@@ -232,7 +232,13 @@ export function HomePage(_props: HomePageProps) {
         const handleWheel = (e: WheelEvent) => {
             if (isModalOpen) return
 
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+            // Trackpad'lerde dikey scroll sırasında deltaX hiçbir zaman tam sıfır olmaz —
+            // ufak bir eşik olmadan bu doğal gürültü, sayfa scroll'unu rastgele anlarda
+            // kesip aromayı istemsizce değiştiriyordu ("tutarsız scroll" hissi). Sadece
+            // açıkça yatay olan hareketlerde (deltaX, deltaY'nin belirgin şekilde üzerinde)
+            // devreye giriyoruz.
+            const isClearlyHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5 && Math.abs(e.deltaX) > 8
+            if (isClearlyHorizontal) {
                 e.preventDefault()
                 if (isCoolingDown) return
                 isCoolingDown = true
@@ -244,9 +250,11 @@ export function HomePage(_props: HomePageProps) {
                 setTimeout(() => { isCoolingDown = false }, 450)
             }
         }
-        const container = containerRef.current
-        container?.addEventListener('wheel', handleWheel, { passive: false })
-        return () => container?.removeEventListener('wheel', handleWheel)
+        // Sadece carousel görüntü alanına bağlanır — hero'nun geri kalanında (başlık,
+        // açıklama) sayfa scroll'u bu mantığa hiç takılmadan normal çalışır.
+        const viewport = carouselViewportRef.current
+        viewport?.addEventListener('wheel', handleWheel, { passive: false })
+        return () => viewport?.removeEventListener('wheel', handleWheel)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeIdx, isModalOpen])
 

@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Footer } from './components/Footer'
+import { ScrollToTop } from './components/ScrollToTop'
 import { AiAssistant } from './components/AiAssistant'
 import { CartDrawer } from './components/CartDrawer'
 import { CheckoutModal } from './components/CheckoutModal'
@@ -67,6 +68,7 @@ export function App() {
 
     return (
         <CartProvider>
+        <ScrollToTop />
         <div style={{ background: '#0a0a0a', minHeight: '100vh', width: '100%', color: '#fff', display: 'flex', flexDirection: 'column' }}>
             {/* Header / Navbar */}
             <header style={{ 

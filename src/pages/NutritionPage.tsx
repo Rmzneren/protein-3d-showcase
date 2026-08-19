@@ -1,11 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import gsap from 'gsap'
 import {
     Zap, ShieldCheck, HeartPulse, Droplets, ChevronDown,
     Wheat, FlaskConical, Microscope, PackageCheck, Star, Quote,
+    Calculator, ShoppingBag, Camera, X,
 } from 'lucide-react'
 import { FLAVORS } from '../data/flavors'
+import { useCart } from '../hooks/useCart'
 import { revealOnScroll, onEnterView } from '../utils/scrollReveal'
+import { srOnlyStyle } from '../utils/a11y'
 
 const BRAND = '#ff5722'
 const BRAND_RGBA = 'rgba(255, 87, 34, 0.18)'
@@ -49,16 +53,133 @@ const COMPARISON = [
     { label: 'Şeker', ours: 0.4, theirs: 4.5, unit: 'g', max: 5 },
 ]
 
-const TESTIMONIALS = [
-    { initials: 'EK', name: 'Emre K.', role: 'Amatör Vücut Geliştirme', rating: 5, text: 'Çikolatalı aroma gerçekten sudan farksız karışıyor, şişkinlik yapmıyor. 3 aydır düzenli kullanıyorum, fark net.' },
-    { initials: 'SA', name: 'Selin A.', role: 'Pilates Eğitmeni', rating: 5, text: 'Muzlu aromayı özellikle antrenman öncesi tercih ediyorum, mide de hiç rahatsızlık yapmıyor.' },
-    { initials: 'BT', name: 'Barış T.', role: 'Amatör Triatlet', rating: 4, text: 'Berry Fusion toparlanma sürecimi belirgin şekilde hızlandırdı, düşük şeker oranı da artı puan.' },
+// Kilo başına önerilen protein aralığı (g/kg) — hedefe göre kabaca genel spor
+// beslenmesi rehberleri baz alınmıştır (0.8g/kg sedanter ↔ 2.2g/kg yoğun kesim
+// dönemi). Kesin/kişisel doz için FAQ'daki gibi bir diyetisyene danışılması önerilir.
+const CALC_GOALS = [
+    { id: 'maintain', label: 'Koruma / Genel Sağlık', multiplier: 1.2, desc: 'Mevcut kas kütlenizi korumak ve genel sağlığınızı desteklemek için.' },
+    { id: 'gain', label: 'Kas Kütlesi Kazanımı', multiplier: 1.8, desc: 'Antrenmanla birlikte kas gelişimini hızlandırmak için.' },
+    { id: 'cut', label: 'Yağ Yakımı (Kesim)', multiplier: 2.2, desc: 'Kalori açığındayken kas kütlesini korumak, daha yüksek protein alımı gerektirir.' },
+] as const
+
+interface Testimonial {
+    initials: string
+    name: string
+    role: string
+    rating: number
+    text: string
+    // Kullanıcının yorumuna eklediği fotoğraf — örnek/başlangıç yorumlarında kendi
+    // ürün fotoğraflarımızdan biri (bahsettikleri aromanın şişesi), ziyaretçinin
+    // kendi eklediği yorumlarda ise seçtiği dosyanın object URL önizlemesi.
+    photo?: string
+    isNew?: boolean
+}
+
+const TESTIMONIALS: Testimonial[] = [
+    { initials: 'EK', name: 'Emre K.', role: 'Amatör Vücut Geliştirme', rating: 5, text: 'Çikolatalı aroma gerçekten sudan farksız karışıyor, şişkinlik yapmıyor. 3 aydır düzenli kullanıyorum, fark net.', photo: '/images/chocolate.webp' },
+    { initials: 'SA', name: 'Selin A.', role: 'Pilates Eğitmeni', rating: 5, text: 'Muzlu aromayı özellikle antrenman öncesi tercih ediyorum, mide de hiç rahatsızlık yapmıyor.', photo: '/images/banana.webp' },
+    { initials: 'BT', name: 'Barış T.', role: 'Amatör Triatlet', rating: 4, text: 'Berry Fusion toparlanma sürecimi belirgin şekilde hızlandırdı, düşük şeker oranı da artı puan.', photo: '/images/berry.webp' },
 ]
 
 export function NutritionPage() {
     const containerRef = useRef<HTMLDivElement>(null)
     const compareRef = useRef<HTMLDivElement>(null)
     const [openFaq, setOpenFaq] = useState<number | null>(0)
+    const { addToCart } = useCart()
+
+    // ==========================================================
+    // PROTEİN İHTİYACI HESAPLAYICI
+    // ==========================================================
+    const [weight, setWeight] = useState(75)
+    const [goalId, setGoalId] = useState<(typeof CALC_GOALS)[number]['id']>('maintain')
+    const resultRef = useRef<HTMLSpanElement>(null)
+
+    const goal = CALC_GOALS.find((g) => g.id === goalId) ?? CALC_GOALS[0]
+    const dailyProtein = Math.round(weight * goal.multiplier)
+
+    // Hedefe göre önerilen aroma: koruma için en çok satan, kütle/kesim gibi daha
+    // yüksek protein ihtiyacı olan hedeflerde ölçek başına en yüksek proteinli aroma.
+    const recommendedFlavor = useMemo(() => {
+        if (goalId === 'maintain') {
+            return FLAVORS.find((f) => f.badge === 'BEST SELLER') ?? FLAVORS[0]
+        }
+        return [...FLAVORS].sort((a, b) => parseFloat(b.stats.protein) - parseFloat(a.stats.protein))[0]
+    }, [goalId])
+
+    // Sonuç rakamı her değiştiğinde sayaç animasyonuyla yeni değere akar (bkz. HomePage'deki güven bandı sayaçları)
+    useEffect(() => {
+        const counter = { val: Number(resultRef.current?.textContent?.replace(/\D/g, '')) || 0 }
+        gsap.to(counter, {
+            val: dailyProtein,
+            duration: 0.6,
+            ease: 'power2.out',
+            onUpdate: () => { if (resultRef.current) resultRef.current.textContent = `${Math.round(counter.val)}g` },
+        })
+    }, [dailyProtein])
+
+    // ==========================================================
+    // MÜŞTERİ YORUMLARI — fotoğraflı yorum ekleme (frontend-only demo)
+    // ==========================================================
+    const [testimonials, setTestimonials] = useState<Testimonial[]>(TESTIMONIALS)
+    const [reviewName, setReviewName] = useState('')
+    const [reviewRole, setReviewRole] = useState('')
+    const [reviewRating, setReviewRating] = useState(5)
+    const [reviewText, setReviewText] = useState('')
+    const [reviewPhoto, setReviewPhoto] = useState<string | null>(null)
+    const reviewFileInputRef = useRef<HTMLInputElement>(null)
+    // Gönderilen bir yoruma photo olarak devredilen URL'i, form sıfırlanırken
+    // yanlışlıkla revoke etmemek için ayrıca takip ediyoruz (aksi halde o
+    // yorumun görseli kırılırdı — bkz. handleSubmitReview).
+    const reviewPhotoRef = useRef<string | null>(null)
+    reviewPhotoRef.current = reviewPhoto
+
+    // Sadece henüz gönderilmemiş bir taslak fotoğraf varken, bileşen kaldırılırsa
+    // (ör. kullanıcı formu doldurup göndermeden sayfadan ayrılırsa) onu serbest bırakır.
+    useEffect(() => {
+        return () => { if (reviewPhotoRef.current) URL.revokeObjectURL(reviewPhotoRef.current) }
+    }, [])
+
+    const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        if (reviewPhoto) URL.revokeObjectURL(reviewPhoto)
+        setReviewPhoto(URL.createObjectURL(file))
+    }
+
+    const handleRemovePhoto = () => {
+        if (reviewPhoto) URL.revokeObjectURL(reviewPhoto)
+        setReviewPhoto(null)
+        if (reviewFileInputRef.current) reviewFileInputRef.current.value = ''
+    }
+
+    const handleSubmitReview = (e: FormEvent) => {
+        e.preventDefault()
+        const trimmedName = reviewName.trim()
+        const trimmedText = reviewText.trim()
+        if (!trimmedName || !trimmedText) return
+
+        const initials = trimmedName.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase() || '??'
+
+        setTestimonials((prev) => [
+            {
+                initials,
+                name: trimmedName,
+                role: reviewRole.trim() || 'PROTEIN3D Kullanıcısı',
+                rating: reviewRating,
+                text: trimmedText,
+                photo: reviewPhoto ?? undefined,
+                isNew: true,
+            },
+            ...prev,
+        ])
+
+        setReviewName('')
+        setReviewRole('')
+        setReviewText('')
+        setReviewRating(5)
+        setReviewPhoto(null)
+        if (reviewFileInputRef.current) reviewFileInputRef.current.value = ''
+    }
 
     useEffect(() => {
         const root = containerRef.current
@@ -139,6 +260,83 @@ export function NutritionPage() {
                             <p style={{ color: '#777', fontSize: '14px', lineHeight: 1.6 }}>{f.desc}</p>
                         </div>
                     ))}
+                </div>
+
+                {/* --- PROTEİN İHTİYACI HESAPLAYICI --- */}
+                <div className="scroll-reveal" style={{ marginBottom: '110px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: BRAND, fontSize: '13px', fontWeight: 900, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '14px' }}>
+                            <Calculator size={14} />
+                            <span>Size Özel</span>
+                        </div>
+                        <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: '-1px' }}>Protein İhtiyacınızı Hesaplayın</h2>
+                    </div>
+
+                    <div style={{
+                        maxWidth: '820px', margin: '0 auto', background: '#111', border: '1px solid #222', borderRadius: '28px',
+                        padding: 'clamp(24px, 4vw, 44px)', display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '36px', alignItems: 'center',
+                    }}>
+                        <div>
+                            <label htmlFor="calc-weight" style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#aaa', marginBottom: '8px' }}>
+                                Kilonuz: <span style={{ color: BRAND }}>{weight} kg</span>
+                            </label>
+                            <input
+                                id="calc-weight"
+                                type="range"
+                                min={40}
+                                max={150}
+                                value={weight}
+                                onChange={(e) => setWeight(Number(e.target.value))}
+                                style={{ width: '100%', accentColor: BRAND, marginBottom: '24px' }}
+                            />
+
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#aaa', marginBottom: '10px' }}>Hedefiniz</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {CALC_GOALS.map((g) => (
+                                    <button
+                                        key={g.id}
+                                        type="button"
+                                        onClick={() => setGoalId(g.id)}
+                                        aria-pressed={goalId === g.id}
+                                        style={{
+                                            textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '2px',
+                                            padding: '12px 16px', borderRadius: '14px', cursor: 'pointer',
+                                            background: goalId === g.id ? BRAND_RGBA : 'rgba(255,255,255,0.03)',
+                                            border: `1px solid ${goalId === g.id ? BRAND : 'rgba(255,255,255,0.08)'}`,
+                                            color: '#fff', transition: 'border-color 0.2s ease, background 0.2s ease',
+                                        }}
+                                    >
+                                        <span style={{ fontSize: '14px', fontWeight: 700 }}>{g.label}</span>
+                                        <span style={{ fontSize: '12px', color: '#888' }}>{g.desc}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{
+                            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px',
+                            padding: '28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px',
+                        }}>
+                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#888', letterSpacing: '1px', textTransform: 'uppercase' }}>Günlük Protein İhtiyacınız</span>
+                            <span ref={resultRef} style={{ fontSize: 'clamp(40px, 6vw, 56px)', fontWeight: 900, color: BRAND, lineHeight: 1 }}>0g</span>
+                            <span style={{ fontSize: '13px', color: '#999', marginBottom: '18px' }}>
+                                Önerilen aroma: <strong style={{ color: '#fff' }}>{recommendedFlavor.title}</strong> ({recommendedFlavor.stats.protein} / ölçek)
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => addToCart(recommendedFlavor)}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '8px', background: BRAND, color: '#fff', border: 'none',
+                                    borderRadius: '14px', padding: '12px 22px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer',
+                                }}
+                            >
+                                <ShoppingBag size={16} /> Sepete Ekle
+                            </button>
+                            <span style={{ fontSize: '11px', color: '#666', marginTop: '14px' }}>
+                                Bu hesaplama genel bir tahmindir; kişisel ihtiyaçlarınız için bir diyetisyene danışın.
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* --- ÜRETİM SÜRECİ --- */}
@@ -233,13 +431,20 @@ export function NutritionPage() {
                         <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 900, margin: 0, letterSpacing: '-1px' }}>Sporcularımız Ne Diyor?</h2>
                     </div>
 
-                    <div className="testimonial-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-                        {TESTIMONIALS.map((t, i) => (
+                    <div className="testimonial-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '32px' }}>
+                        {testimonials.map((t, i) => (
                             <div
                                 key={i}
-                                className="testimonial-card"
+                                className={t.isNew ? 'testimonial-card ai-msg-in' : 'testimonial-card'}
                                 style={{ background: '#111', border: '1px solid #222', borderRadius: '20px', padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}
                             >
+                                {t.photo && (
+                                    <img
+                                        src={t.photo}
+                                        alt={`${t.name} tarafından yoruma eklenen fotoğraf`}
+                                        style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '12px', background: '#000' }}
+                                    />
+                                )}
                                 <Quote size={26} color={BRAND} style={{ opacity: 0.6 }} />
                                 <p style={{ color: '#ccc', fontSize: '14.5px', lineHeight: 1.7, margin: 0, flex: 1 }}>{t.text}</p>
                                 <div style={{ display: 'flex', gap: '2px' }}>
@@ -262,6 +467,117 @@ export function NutritionPage() {
                             </div>
                         ))}
                     </div>
+
+                    {/* Yorum ekleme formu — tamamen istemci tarafında (frontend-only) çalışan bir
+                        demo: hiçbir veri sunucuya gönderilmez, sayfa yenilenince sıfırlanır. */}
+                    <form
+                        onSubmit={handleSubmitReview}
+                        className="scroll-reveal"
+                        style={{
+                            maxWidth: '640px', margin: '0 auto', background: '#111', border: '1px solid #222', borderRadius: '20px',
+                            padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px',
+                        }}
+                    >
+                        <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0 }}>Deneyimini Paylaş</h3>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            <div>
+                                <label htmlFor="review-name" style={srOnlyStyle}>İsminiz</label>
+                                <input
+                                    id="review-name"
+                                    type="text"
+                                    value={reviewName}
+                                    onChange={(e) => setReviewName(e.target.value)}
+                                    placeholder="İsminiz"
+                                    required
+                                    maxLength={40}
+                                    style={{ width: '100%', background: '#161616', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', padding: '10px 14px', color: '#fff', fontSize: '13.5px' }}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="review-role" style={srOnlyStyle}>Rolünüz (opsiyonel)</label>
+                                <input
+                                    id="review-role"
+                                    type="text"
+                                    value={reviewRole}
+                                    onChange={(e) => setReviewRole(e.target.value)}
+                                    placeholder="Rolünüz (opsiyonel)"
+                                    maxLength={40}
+                                    style={{ width: '100%', background: '#161616', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', padding: '10px 14px', color: '#fff', fontSize: '13.5px' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <span id="review-rating-label" style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#aaa', marginBottom: '6px' }}>Puanınız</span>
+                            <div role="radiogroup" aria-labelledby="review-rating-label" style={{ display: 'flex', gap: '4px' }}>
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                    <button
+                                        key={n}
+                                        type="button"
+                                        role="radio"
+                                        aria-checked={n === reviewRating}
+                                        onClick={() => setReviewRating(n)}
+                                        aria-label={`${n} yıldız`}
+                                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '2px' }}
+                                    >
+                                        <Star size={22} color={BRAND} fill={n <= reviewRating ? BRAND : 'transparent'} />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="review-text" style={srOnlyStyle}>Yorumunuz</label>
+                            <textarea
+                                id="review-text"
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
+                                placeholder="Deneyiminizi anlatın…"
+                                required
+                                maxLength={400}
+                                rows={3}
+                                style={{ width: '100%', resize: 'vertical', background: '#161616', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', padding: '10px 14px', color: '#fff', fontSize: '13.5px', fontFamily: 'inherit' }}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                            <label
+                                htmlFor="review-photo-input"
+                                style={{ display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid rgba(255,87,34,0.35)', background: 'rgba(255,87,34,0.08)', color: '#ffab91', borderRadius: '20px', padding: '8px 14px', fontSize: '12.5px', cursor: 'pointer', flexShrink: 0 }}
+                            >
+                                <Camera size={14} /> {reviewPhoto ? 'Fotoğrafı Değiştir' : 'Fotoğraf Ekle (opsiyonel)'}
+                            </label>
+                            <input
+                                ref={reviewFileInputRef}
+                                id="review-photo-input"
+                                type="file"
+                                accept="image/*"
+                                onChange={handlePhotoChange}
+                                style={srOnlyStyle}
+                            />
+                            {reviewPhoto && (
+                                <div style={{ position: 'relative', flexShrink: 0 }}>
+                                    <img src={reviewPhoto} alt="Eklediğiniz fotoğrafın önizlemesi" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '10px' }} />
+                                    <button
+                                        type="button"
+                                        onClick={handleRemovePhoto}
+                                        aria-label="Fotoğrafı kaldır"
+                                        style={{ position: 'absolute', top: '-6px', right: '-6px', width: '18px', height: '18px', borderRadius: '50%', background: '#000', border: '1px solid #333', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 }}
+                                    >
+                                        <X size={11} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            type="submit"
+                            style={{ alignSelf: 'flex-start', background: BRAND, color: '#fff', border: 'none', borderRadius: '12px', padding: '11px 24px', fontSize: '13.5px', fontWeight: 800, cursor: 'pointer' }}
+                        >
+                            Yorumu Paylaş
+                        </button>
+                    </form>
                 </div>
 
                 {/* --- SIKÇA SORULAN SORULAR --- */}
