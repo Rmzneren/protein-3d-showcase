@@ -6,13 +6,15 @@ import { ParticleBackground } from '../components/ParticleBackground'
 import { BurstCanvas } from '../components/BurstCanvas'
 import type { BurstCanvasRef } from '../components/BurstCanvas'
 import { srOnlyStyle } from '../utils/a11y'
+import { revealOnScroll, onEnterView } from '../utils/scrollReveal'
 
 // Güven bandında gösterilen rakamlar — pazarlama içeriği, veritabanından gelmiyor.
+// `target` sayaç animasyonunun ulaşacağı sayısal değer, `format` ekranda nasıl göstereceğini belirler.
 const TRUST_STATS = [
-    { icon: Users, value: '50.000+', label: 'Mutlu Sporcu' },
-    { icon: Award, value: '15+ Yıl', label: 'Sektör Tecrübesi' },
-    { icon: Leaf, value: '%100', label: 'Doğal İçerik' },
-    { icon: Star, value: '4.9 / 5', label: 'Müşteri Puanı' },
+    { icon: Users, target: 50000, decimals: 0, format: (n: number) => `${Math.round(n).toLocaleString('tr-TR')}+`, label: 'Mutlu Sporcu' },
+    { icon: Award, target: 15, decimals: 0, format: (n: number) => `${Math.round(n)}+ Yıl`, label: 'Sektör Tecrübesi' },
+    { icon: Leaf, target: 100, decimals: 0, format: (n: number) => `%${Math.round(n)}`, label: 'Doğal İçerik' },
+    { icon: Star, target: 4.9, decimals: 1, format: (n: number) => `${n.toFixed(1)} / 5`, label: 'Müşteri Puanı' },
 ]
 
 // "Nasıl Kullanılır" bölümündeki 3 adım.
@@ -54,6 +56,10 @@ export function HomePage(_props: HomePageProps) {
     // Modal açılmadan önce odaktaki elemanı sakla — modal kapanınca odak oraya döner
     const detailsButtonRef = useRef<HTMLButtonElement>(null)
     const closeButtonRef = useRef<HTMLButtonElement>(null)
+    // Güven bandındaki sayaç elemanlarına erişim (0'dan hedef değere sayma animasyonu için)
+    const statRefs = useRef<(HTMLDivElement | null)[]>([])
+    // Sayfanın en dış sarmalayıcısı — scroll-reveal sorgularının kapsamı için
+    const pageRef = useRef<HTMLDivElement>(null)
 
     const cursorStyle = 'none'
 
@@ -359,17 +365,35 @@ export function HomePage(_props: HomePageProps) {
     const leaveHover = () => gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.3 })
 
     // ==========================================================
-    // EK İÇERİK BÖLÜMLERİ (Güven bandı + Nasıl Kullanılır) — sayfa açılışında belirir
+    // EK İÇERİK BÖLÜMLERİ (Güven bandı + Nasıl Kullanılır) — ekrana girince tetiklenir
     // ==========================================================
     useEffect(() => {
-        gsap.fromTo('.home-reveal',
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, delay: 0.3, ease: 'power3.out' }
-        )
+        const root = pageRef.current
+        if (!root) return
+
+        const cleanups = [
+            revealOnScroll(root, '.home-reveal', { stagger: 0.1 }),
+            revealOnScroll(root, '.how-it-works-reveal', { stagger: 0.1 }),
+            onEnterView(root, root.querySelector<HTMLElement>('.trust-band'), () => {
+                TRUST_STATS.forEach((stat, i) => {
+                    const el = statRefs.current[i]
+                    if (!el) return
+                    const counter = { val: 0 }
+                    gsap.to(counter, {
+                        val: stat.target,
+                        duration: 1.6,
+                        ease: 'power2.out',
+                        onUpdate: () => { el.textContent = stat.format(counter.val) },
+                    })
+                })
+            }),
+        ]
+
+        return () => cleanups.forEach((fn) => fn())
     }, [])
 
     return (
-        <div style={{ background: '#030303', width: '100%', minHeight: '100%', position: 'relative' }}>
+        <div ref={pageRef} style={{ background: '#030303', width: '100%', minHeight: '100%', position: 'relative' }}>
 
             {/* Özel İmleç */}
             <div
@@ -563,7 +587,7 @@ export function HomePage(_props: HomePageProps) {
             </div>
 
             {/* --- GÜVEN BANDI (TRUST STATS) --- */}
-            <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', background: '#050505', position: 'relative', zIndex: 3 }}>
+            <div className="trust-band" style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', background: '#050505', position: 'relative', zIndex: 3 }}>
                 <div style={{
                     maxWidth: '1200px', margin: '0 auto', padding: 'clamp(32px, 5vw, 56px) 5%',
                     display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '32px'
@@ -578,7 +602,13 @@ export function HomePage(_props: HomePageProps) {
                                 <stat.icon size={24} color={current.color} style={{ transition: 'color 0.4s ease' }} />
                             </div>
                             <div>
-                                <div style={{ fontSize: 'clamp(20px, 2.4vw, 26px)', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>{stat.value}</div>
+                                <div
+                                    ref={(el) => { statRefs.current[i] = el }}
+                                    className="stat-number"
+                                    style={{ fontSize: 'clamp(20px, 2.4vw, 26px)', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}
+                                >
+                                    {stat.format(0)}
+                                </div>
                                 <div style={{ fontSize: '13px', color: '#8a8a8a', marginTop: '4px' }}>{stat.label}</div>
                             </div>
                         </div>
@@ -589,7 +619,7 @@ export function HomePage(_props: HomePageProps) {
             {/* --- NASIL KULLANILIR (3 ADIM) --- */}
             <div style={{ width: '100%', background: '#030303', position: 'relative', zIndex: 3, padding: 'clamp(60px, 8vw, 100px) 5%' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-                    <div className="home-reveal" style={{ textAlign: 'center', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
+                    <div className="how-it-works-reveal" style={{ textAlign: 'center', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: current.color, fontSize: '13px', fontWeight: 900, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '14px' }}>
                             <Sparkles size={14} />
                             <span>Basit &amp; Etkili</span>
@@ -599,11 +629,11 @@ export function HomePage(_props: HomePageProps) {
                         </h2>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '28px' }}>
+                    <div className="how-it-works-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '28px' }}>
                         {HOW_IT_WORKS.map((item, i) => (
                             <div
                                 key={i}
-                                className="home-reveal"
+                                className="how-it-works-reveal"
                                 style={{
                                     position: 'relative', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
                                     borderRadius: '20px', padding: '32px 28px', overflow: 'hidden'
