@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { Sparkles, X, Users, Award, Leaf, Star, CupSoda, Timer, TrendingUp, ShoppingBag } from 'lucide-react'
-import { FLAVORS } from '../data/flavors'
+import { localizeFlavors } from '../data/flavors'
 import { useCart } from '../hooks/useCart'
+import { useLanguage } from '../hooks/useLanguage'
 import { ParticleBackground } from '../components/ParticleBackground'
 import { BurstCanvas } from '../components/BurstCanvas'
 import { LiquidDripCanvas } from '../components/LiquidDripCanvas'
@@ -11,20 +12,20 @@ import type { BurstCanvasRef } from '../components/BurstCanvas'
 import { srOnlyStyle } from '../utils/a11y'
 import { revealOnScroll, onEnterView } from '../utils/scrollReveal'
 
-// Güven bandında gösterilen rakamlar — pazarlama içeriği, veritabanından gelmiyor.
+// Güven bandındaki rakamlar (etiketler t.home.trustStats'tan gelir, dile bağlı değil).
 // `target` sayaç animasyonunun ulaşacağı sayısal değer, `format` ekranda nasıl göstereceğini belirler.
 const TRUST_STATS = [
-    { icon: Users, target: 50000, decimals: 0, format: (n: number) => `${Math.round(n).toLocaleString('tr-TR')}+`, label: 'Mutlu Sporcu' },
-    { icon: Award, target: 15, decimals: 0, format: (n: number) => `${Math.round(n)}+ Yıl`, label: 'Sektör Tecrübesi' },
-    { icon: Leaf, target: 100, decimals: 0, format: (n: number) => `%${Math.round(n)}`, label: 'Doğal İçerik' },
-    { icon: Star, target: 4.9, decimals: 1, format: (n: number) => `${n.toFixed(1)} / 5`, label: 'Müşteri Puanı' },
+    { icon: Users, target: 50000, format: (n: number, locale: string) => `${Math.round(n).toLocaleString(locale)}+` },
+    { icon: Award, target: 15, format: (n: number) => `${Math.round(n)}+` },
+    { icon: Leaf, target: 100, format: (n: number) => `%${Math.round(n)}` },
+    { icon: Star, target: 4.9, format: (n: number) => `${n.toFixed(1)} / 5` },
 ]
 
-// "Nasıl Kullanılır" bölümündeki 3 adım.
+// "Nasıl Kullanılır" bölümündeki 3 adım — başlık/açıklama t.home.howItWorks.steps'ten gelir.
 const HOW_IT_WORKS = [
-    { icon: CupSoda, step: '01', title: 'KARIŞTIR', desc: 'Bir ölçek PROTEIN3D\'yi 250ml su ya da süt ile shaker içinde karıştırın.' },
-    { icon: Timer, step: '02', title: 'DOĞRU ZAMANDA TÜKET', desc: 'Maksimum verim için antrenman öncesi veya sonrası 30 dakika içinde için.' },
-    { icon: TrendingUp, step: '03', title: 'SONUÇLARI GÖR', desc: 'Düzenli kullanımla kas gelişiminizi ve toparlanmanızı hızlandırın.' },
+    { icon: CupSoda, step: '01' },
+    { icon: Timer, step: '02' },
+    { icon: TrendingUp, step: '03' },
 ]
 
 interface HomePageProps {
@@ -43,6 +44,8 @@ const FLAVOR_EMOJI: Record<string, string> = {
 
 export function HomePage(_props: HomePageProps) {
     const { addToCart } = useCart()
+    const { lang, t } = useLanguage()
+    const FLAVORS = useMemo(() => localizeFlavors(lang), [lang])
     const [activeIdx, setActiveIdx] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
@@ -396,13 +399,14 @@ export function HomePage(_props: HomePageProps) {
                         val: stat.target,
                         duration: 1.6,
                         ease: 'power2.out',
-                        onUpdate: () => { el.textContent = stat.format(counter.val) },
+                        onUpdate: () => { el.textContent = stat.format(counter.val, t.meta.locale) },
                     })
                 })
             }),
         ]
 
         return () => cleanups.forEach((fn) => fn())
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
@@ -463,7 +467,7 @@ export function HomePage(_props: HomePageProps) {
                         ref={carouselViewportRef}
                         role="region"
                         aria-roledescription="carousel"
-                        aria-label="Aroma seçim vitrini"
+                        aria-label={t.home.carouselAriaLabel}
                         onPointerDown={handlePointerDown}
                         onPointerMove={handlePointerMove}
                         onPointerUp={endDrag}
@@ -476,7 +480,7 @@ export function HomePage(_props: HomePageProps) {
                     >
                         {/* Ekran okuyucular için: aroma değiştiğinde canlı duyuru */}
                         <div aria-live="polite" style={srOnlyStyle}>
-                            {current.title} seçili, {activeIdx + 1} / {FLAVORS.length}
+                            {t.home.liveRegionSelected(current.title, activeIdx + 1, FLAVORS.length)}
                         </div>
 
                         {/* Sol/Sağ ok butonları */}
@@ -484,7 +488,7 @@ export function HomePage(_props: HomePageProps) {
                             onClick={(e) => { e.stopPropagation(); if (!isModalOpen) goToPrev() }}
                             onMouseEnter={enterHover}
                             onMouseLeave={leaveHover}
-                            aria-label="Önceki aroma"
+                            aria-label={t.home.prevAriaLabel}
                             style={{
                                 position: 'absolute', left: 'clamp(0px, 2vw, 20px)', zIndex: 6, cursor: cursorStyle,
                                 width: '46px', height: '46px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.16)',
@@ -499,7 +503,7 @@ export function HomePage(_props: HomePageProps) {
                             onClick={(e) => { e.stopPropagation(); if (!isModalOpen) goToNext() }}
                             onMouseEnter={enterHover}
                             onMouseLeave={leaveHover}
-                            aria-label="Sonraki aroma"
+                            aria-label={t.home.nextAriaLabel}
                             style={{
                                 position: 'absolute', right: 'clamp(0px, 2vw, 20px)', zIndex: 6, cursor: cursorStyle,
                                 width: '46px', height: '46px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.16)',
@@ -520,7 +524,7 @@ export function HomePage(_props: HomePageProps) {
                                         role="button"
                                         tabIndex={0}
                                         aria-current={isSelected}
-                                        aria-label={isSelected ? `${item.title} — seçili aroma, detayları görmek için Enter'a basın` : `${item.title} aromasını seç`}
+                                        aria-label={isSelected ? t.home.cardAriaSelected(item.title) : t.home.cardAriaSelect(item.title)}
                                         onClick={(e) => handleProductClick(index, e)}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' || e.key === ' ') {
@@ -576,7 +580,7 @@ export function HomePage(_props: HomePageProps) {
                                         onMouseEnter={enterHover}
                                         onMouseLeave={leaveHover}
                                         title={item.title}
-                                        aria-label={`${item.title} aromasına git`}
+                                        aria-label={t.home.dotAriaLabel(item.title)}
                                         aria-current={isSelected}
                                         style={{
                                             width: isSelected ? '28px' : '8px', height: '8px', borderRadius: '5px',
@@ -597,11 +601,11 @@ export function HomePage(_props: HomePageProps) {
                             onMouseLeave={leaveHover}
                             style={{ padding: '16px 40px', borderRadius: '40px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.18)', color: '#ffffff', fontWeight: 900, fontSize: '13px', letterSpacing: '2px', cursor: cursorStyle, transition: 'all 0.3s ease', backdropFilter: 'blur(10px)' }}
                         >
-                            DETAYLARI İNCELE
+                            {t.home.detailsButton}
                         </button>
 
                         <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', margin: 0, textAlign: 'center' }}>
-                            Sürükle, tıkla ya da ok tuşlarıyla aromalar arasında gez
+                            {t.home.hint}
                         </p>
                     </div>
                 </div>
@@ -628,9 +632,9 @@ export function HomePage(_props: HomePageProps) {
                                     className="stat-number"
                                     style={{ fontSize: 'clamp(20px, 2.4vw, 26px)', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}
                                 >
-                                    {stat.format(0)}
+                                    {stat.format(0, t.meta.locale)}
                                 </div>
-                                <div style={{ fontSize: '13px', color: '#8a8a8a', marginTop: '4px' }}>{stat.label}</div>
+                                <div style={{ fontSize: '13px', color: '#8a8a8a', marginTop: '4px' }}>{t.home.trustStats[i]}</div>
                             </div>
                         </div>
                     ))}
@@ -643,10 +647,10 @@ export function HomePage(_props: HomePageProps) {
                     <div className="how-it-works-reveal" style={{ textAlign: 'center', marginBottom: 'clamp(40px, 5vw, 64px)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: current.color, fontSize: '13px', fontWeight: 900, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '14px' }}>
                             <Sparkles size={14} />
-                            <span>Basit &amp; Etkili</span>
+                            <span>{t.home.howItWorks.eyebrow}</span>
                         </div>
                         <h2 style={{ fontSize: 'clamp(28px, 4vw, 46px)', fontWeight: 900, color: '#fff', margin: 0, letterSpacing: '-1px' }}>
-                            Nasıl Kullanılır?
+                            {t.home.howItWorks.title}
                         </h2>
                     </div>
 
@@ -669,8 +673,8 @@ export function HomePage(_props: HomePageProps) {
                                 }}>
                                     <item.icon size={24} color={current.color} />
                                 </div>
-                                <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#fff', letterSpacing: '0.5px', marginBottom: '10px' }}>{item.title}</h3>
-                                <p style={{ fontSize: '14px', color: '#8a8a8a', lineHeight: 1.6, margin: 0 }}>{item.desc}</p>
+                                <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#fff', letterSpacing: '0.5px', marginBottom: '10px' }}>{t.home.howItWorks.steps[i].title}</h3>
+                                <p style={{ fontSize: '14px', color: '#8a8a8a', lineHeight: 1.6, margin: 0 }}>{t.home.howItWorks.steps[i].desc}</p>
                             </div>
                         ))}
                     </div>
@@ -697,7 +701,7 @@ export function HomePage(_props: HomePageProps) {
                     onClick={closeProductDetails}
                     onMouseEnter={enterHover}
                     onMouseLeave={leaveHover}
-                    aria-label="Detayları kapat"
+                    aria-label={t.home.modal.closeAriaLabel}
                     style={{ position: 'absolute', top: '24px', right: '24px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '15px', borderRadius: '50%', cursor: cursorStyle, transition: '0.3s', zIndex: 2010, backdropFilter: 'blur(5px)' }}
                 >
                     <X size={24} />
@@ -707,23 +711,23 @@ export function HomePage(_props: HomePageProps) {
 
                     {/* Parçalanan İçerik Kartları — artık her aromanın GERÇEK besin değerlerini gösteriyor */}
                     <div className="modal-ing-1" style={{ position: 'absolute', padding: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '15px', border: `1px solid ${current.color}`, color: '#fff', backdropFilter: 'blur(10px)', width: '220px' }}>
-                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.protein} PROTEİN</h4>
-                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>Kas gelişimini destekleyen yüksek kaliteli protein kaynağı.</p>
+                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.protein} {t.home.modal.ingredientLabels.protein}</h4>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>{t.home.modal.ingredientDescs.protein}</p>
                     </div>
 
                     <div className="modal-ing-2" style={{ position: 'absolute', padding: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '15px', border: `1px solid ${current.color}`, color: '#fff', backdropFilter: 'blur(10px)', width: '220px' }}>
-                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.bcaa} BCAA</h4>
-                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>Toparlanmayı hızlandıran dallı zincirli amino asitler.</p>
+                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.bcaa} {t.home.modal.ingredientLabels.bcaa}</h4>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>{t.home.modal.ingredientDescs.bcaa}</p>
                     </div>
 
                     <div className="modal-ing-3" style={{ position: 'absolute', padding: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '15px', border: `1px solid ${current.color}`, color: '#fff', backdropFilter: 'blur(10px)', width: '220px' }}>
-                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.sugar} ŞEKER</h4>
-                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>Kan şekerini dengede tutan sade ve şeffaf formül.</p>
+                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.sugar} {t.home.modal.ingredientLabels.sugar}</h4>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>{t.home.modal.ingredientDescs.sugar}</p>
                     </div>
 
                     <div className="modal-ing-4" style={{ position: 'absolute', padding: '20px', background: 'rgba(255,255,255,0.08)', borderRadius: '15px', border: `1px solid ${current.color}`, color: '#fff', backdropFilter: 'blur(10px)', width: '220px' }}>
-                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.kcal} KCAL</h4>
-                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>Dengeli enerji için optimize edilmiş kalori değeri.</p>
+                        <h4 style={{ margin: 0, color: current.color, fontSize: '16px', fontWeight: 800 }}>{current.stats.kcal} {t.home.modal.ingredientLabels.kcal}</h4>
+                        <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#ccc', lineHeight: '1.4' }}>{t.home.modal.ingredientDescs.kcal}</p>
                     </div>
 
                     {/* Merkezdeki Büyük Şişe */}
@@ -736,7 +740,7 @@ export function HomePage(_props: HomePageProps) {
 
                     {/* Modal İçindeki Başlık */}
                     <h2 id="product-modal-title" className="modal-title" style={{ position: 'absolute', bottom: '14%', fontSize: 'clamp(22px, 4vw, 42px)', fontWeight: 900, color: '#fff', letterSpacing: '4px', textTransform: 'uppercase', textAlign: 'center', padding: '0 16px' }}>
-                        Formülün Sırrı
+                        {t.home.modal.title}
                     </h2>
 
                     {/* Fiyat + Sepete Ekle */}
@@ -750,7 +754,7 @@ export function HomePage(_props: HomePageProps) {
                                 display: 'flex', alignItems: 'center', gap: '8px', boxShadow: `0 10px 30px ${current.rgba}`,
                             }}
                         >
-                            <ShoppingBag size={16} /> SEPETE EKLE
+                            <ShoppingBag size={16} /> {t.home.modal.addToCart}
                         </button>
                     </div>
                 </div>

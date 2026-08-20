@@ -3,35 +3,18 @@ import gsap from 'gsap'
 import { Mail, MapPin, Phone, Send, Clock, Globe, Share2, MessageCircle, Sparkles } from 'lucide-react'
 import { srOnlyStyle } from '../utils/a11y'
 import { revealOnScroll } from '../utils/scrollReveal'
+import { useLanguage } from '../hooks/useLanguage'
 
 const BRAND = '#ff5722'
 const BRAND_RGBA = 'rgba(255, 87, 34, 0.18)'
 
-const CONTACT_METHODS = [
-    { icon: Mail, label: 'E-posta', value: 'hello@brand.com' },
-    { icon: Phone, label: 'Telefon', value: '+90 555 000 00 00' },
-    { icon: MapPin, label: 'Adres', value: 'Tekirdağ, Türkiye' },
-]
-
-const WORKING_HOURS = [
-    { day: 'Pazartesi – Cuma', hours: '09:00 – 18:00' },
-    { day: 'Cumartesi', hours: '10:00 – 16:00' },
-    { day: 'Pazar', hours: 'Kapalı' },
-]
-
-const SOCIALS = [
-    { icon: Globe, label: 'Web sitemiz' },
-    { icon: Share2, label: 'Bizi paylaşın' },
-    { icon: MessageCircle, label: 'Bize mesaj gönderin' },
-]
-
-const MINI_FAQ = [
-    { q: 'Ne kadar sürede yanıt alırım?', a: 'Mesajlarınıza genellikle 24 saat içinde dönüş yapıyoruz.' },
-    { q: 'Toplu sipariş için indirim var mı?', a: 'Evet, 10+ adet siparişlerde özel fiyatlandırma sunuyoruz — bize yazın.' },
-]
+// İkonlar (dile bağlı olmayan kısım) — metinler t.contact.methods/socials'tan index'e göre gelir.
+const METHOD_ICONS = [Mail, Phone, MapPin]
+const SOCIAL_ICONS = [Globe, Share2, MessageCircle]
 
 export function ContactPage() {
     const containerRef = useRef<HTMLDivElement>(null)
+    const { t } = useLanguage()
 
     useEffect(() => {
         const root = containerRef.current
@@ -66,11 +49,11 @@ export function ContactPage() {
                 <div className="anim-item" style={{ position: 'relative', maxWidth: '640px', margin: '0 auto' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: BRAND, fontSize: '13px', fontWeight: 900, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '16px' }}>
                         <Sparkles size={15} />
-                        <span>Bize Ulaşın</span>
+                        <span>{t.contact.hero.eyebrow}</span>
                     </div>
-                    <h2 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, marginBottom: '16px', letterSpacing: '-1.5px' }}>İletişime Geçin</h2>
+                    <h2 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, marginBottom: '16px', letterSpacing: '-1.5px' }}>{t.contact.hero.title}</h2>
                     <p style={{ color: '#8a8a8a', lineHeight: 1.7, fontSize: '15.5px' }}>
-                        Sorularınız mı var veya iş birliği mi yapmak istiyorsunuz? Size yardımcı olmaktan mutluluk duyarız.
+                        {t.contact.hero.body}
                     </p>
                 </div>
             </div>
@@ -78,7 +61,7 @@ export function ContactPage() {
             {/* --- İLETİŞİM YÖNTEMİ KARTLARI --- */}
             <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '30px 20px 0' }}>
                 <div className="method-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-                    {CONTACT_METHODS.map((m, i) => (
+                    {METHOD_ICONS.map((Icon, i) => (
                         <div
                             key={i}
                             className="method-card"
@@ -88,11 +71,11 @@ export function ContactPage() {
                             }}
                         >
                             <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: BRAND_RGBA, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <m.icon size={20} color={BRAND} />
+                                <Icon size={20} color={BRAND} />
                             </div>
                             <div>
-                                <div style={{ color: '#888', fontSize: '11.5px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>{m.label}</div>
-                                <div style={{ fontWeight: 700, fontSize: '14.5px' }}>{m.value}</div>
+                                <div style={{ color: '#888', fontSize: '11.5px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>{t.contact.methods[i].label}</div>
+                                <div style={{ fontWeight: 700, fontSize: '14.5px' }}>{t.contact.methods[i].value}</div>
                             </div>
                         </div>
                     ))}
@@ -108,10 +91,10 @@ export function ContactPage() {
                         <div style={{ background: '#111', border: '1px solid #222', borderRadius: '20px', padding: '28px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
                                 <Clock size={18} color={BRAND} />
-                                <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0 }}>Çalışma Saatleri</h3>
+                                <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0 }}>{t.contact.workingHours.title}</h3>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {WORKING_HOURS.map((w, i) => (
+                                {t.contact.workingHours.rows.map((w, i) => (
                                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13.5px', color: '#ccc' }}>
                                         <span style={{ color: '#888' }}>{w.day}</span>
                                         <span style={{ fontWeight: 700 }}>{w.hours}</span>
@@ -121,14 +104,14 @@ export function ContactPage() {
                         </div>
 
                         <div style={{ background: '#111', border: '1px solid #222', borderRadius: '20px', padding: '28px' }}>
-                            <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px' }}>Bizi Sosyal Medyada Takip Edin</h3>
+                            <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px' }}>{t.contact.socials.title}</h3>
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                {SOCIALS.map(({ icon: Icon, label }, i) => (
+                                {SOCIAL_ICONS.map((Icon, i) => (
                                     <a
                                         key={i}
                                         href="#"
                                         onClick={(e) => e.preventDefault()}
-                                        aria-label={label}
+                                        aria-label={t.contact.socials.items[i].label}
                                         style={{
                                             width: '40px', height: '40px', borderRadius: '50%',
                                             background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
@@ -143,9 +126,9 @@ export function ContactPage() {
                         </div>
 
                         <div style={{ background: `linear-gradient(135deg, ${BRAND_RGBA}, transparent)`, border: `1px solid rgba(255,87,34,0.25)`, borderRadius: '20px', padding: '28px' }}>
-                            <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '14px' }}>Hızlı Sorular</h3>
+                            <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '14px' }}>{t.contact.miniFaq.title}</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                {MINI_FAQ.map((f, i) => (
+                                {t.contact.miniFaq.items.map((f, i) => (
                                     <div key={i}>
                                         <div style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{f.q}</div>
                                         <div style={{ fontSize: '13px', color: '#999', lineHeight: 1.6 }}>{f.a}</div>
@@ -157,16 +140,16 @@ export function ContactPage() {
 
                     {/* Sağ: Form */}
                     <div className="contact-scroll-reveal" style={{ background: '#111', padding: '40px', borderRadius: '20px', border: '1px solid #222', height: 'fit-content' }}>
-                        <h3 style={{ fontSize: '17px', fontWeight: 800, marginBottom: '20px' }}>Bize Mesaj Gönderin</h3>
+                        <h3 style={{ fontSize: '17px', fontWeight: 800, marginBottom: '20px' }}>{t.contact.form.title}</h3>
                         <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <label htmlFor="contact-name" style={srOnlyStyle}>Adınız</label>
-                            <input id="contact-name" name="name" type="text" autoComplete="name" placeholder="Adınız" style={{ background: '#0a0a0a', border: '1px solid #333', padding: '15px', borderRadius: '10px', color: '#fff' }} />
+                            <label htmlFor="contact-name" style={srOnlyStyle}>{t.contact.form.nameLabel}</label>
+                            <input id="contact-name" name="name" type="text" autoComplete="name" placeholder={t.contact.form.namePlaceholder} style={{ background: '#0a0a0a', border: '1px solid #333', padding: '15px', borderRadius: '10px', color: '#fff' }} />
 
-                            <label htmlFor="contact-email" style={srOnlyStyle}>E-posta</label>
-                            <input id="contact-email" name="email" type="email" autoComplete="email" placeholder="E-posta" style={{ background: '#0a0a0a', border: '1px solid #333', padding: '15px', borderRadius: '10px', color: '#fff' }} />
+                            <label htmlFor="contact-email" style={srOnlyStyle}>{t.contact.form.emailLabel}</label>
+                            <input id="contact-email" name="email" type="email" autoComplete="email" placeholder={t.contact.form.emailPlaceholder} style={{ background: '#0a0a0a', border: '1px solid #333', padding: '15px', borderRadius: '10px', color: '#fff' }} />
 
-                            <label htmlFor="contact-message" style={srOnlyStyle}>Mesajınız</label>
-                            <textarea id="contact-message" name="message" placeholder="Mesajınız" rows={5} style={{ background: '#0a0a0a', border: '1px solid #333', padding: '15px', borderRadius: '10px', color: '#fff', resize: 'none' }} />
+                            <label htmlFor="contact-message" style={srOnlyStyle}>{t.contact.form.messageLabel}</label>
+                            <textarea id="contact-message" name="message" placeholder={t.contact.form.messagePlaceholder} rows={5} style={{ background: '#0a0a0a', border: '1px solid #333', padding: '15px', borderRadius: '10px', color: '#fff', resize: 'none' }} />
 
                             <button
                                 type="button"
@@ -175,7 +158,7 @@ export function ContactPage() {
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: 'filter 0.2s ease',
                                 }}
                             >
-                                Gönder <Send size={18} />
+                                {t.contact.form.submit} <Send size={18} />
                             </button>
                         </form>
                     </div>

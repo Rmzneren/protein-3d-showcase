@@ -6,16 +6,19 @@ import { AiAssistant } from './components/AiAssistant'
 import { CartDrawer } from './components/CartDrawer'
 import { CheckoutModal } from './components/CheckoutModal'
 import { CartProvider } from './context/CartContext'
+import { LanguageProvider } from './context/LanguageContext'
 import { useCart } from './hooks/useCart'
-import { Sparkles, Activity, Mail, ShoppingBag } from 'lucide-react'
+import { useLanguage } from './hooks/useLanguage'
+import { Sparkles, Activity, Mail, ShoppingBag, Languages } from 'lucide-react'
 
 // Navbar'daki sepet butonu — dolu ürün sayısını rozet olarak gösterir
 function CartButton() {
     const { totalItems, openCart } = useCart()
+    const { t } = useLanguage()
     return (
         <button
             onClick={openCart}
-            aria-label={totalItems > 0 ? `Sepeti aç, içinde ${totalItems} ürün var` : 'Sepeti aç'}
+            aria-label={totalItems > 0 ? t.nav.cartAriaWithItems(totalItems) : t.nav.cartAriaEmpty}
             style={{
                 position: 'relative', width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)',
                 background: 'rgba(255,255,255,0.03)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -39,6 +42,25 @@ function CartButton() {
     )
 }
 
+// TR/EN dil değiştirme butonu — her zaman geçilecek HEDEF dili gösterir (TR sitedeyken "EN" yazar).
+function LanguageToggle() {
+    const { lang, toggleLang, t } = useLanguage()
+    return (
+        <button
+            onClick={toggleLang}
+            aria-label={t.nav.switchLanguageAria}
+            style={{
+                display: 'flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 14px', borderRadius: '20px',
+                border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', color: '#fff',
+                cursor: 'pointer', flexShrink: 0, fontSize: '12.5px', fontWeight: 800, letterSpacing: '0.5px',
+            }}
+        >
+            <Languages size={15} />
+            {lang === 'tr' ? 'EN' : 'TR'}
+        </button>
+    )
+}
+
 // Rota bazlı kod bölme — her sayfa sadece ziyaret edildiğinde indirilir,
 // ilk yüklemede diğer iki sayfanın kodu hiç indirilmez.
 const HomePage = lazy(() => import('./pages/HomePage').then((m) => ({ default: m.HomePage })))
@@ -47,9 +69,10 @@ const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ defa
 
 // Sayfa geçişlerinde kod indirilirken gösterilen minimal, marka renginde yükleme göstergesi
 function PageFallback() {
+    const { t } = useLanguage()
     return (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-            <div style={{ display: 'flex', gap: '6px' }} aria-label="Sayfa yükleniyor" role="status">
+            <div style={{ display: 'flex', gap: '6px' }} aria-label={t.pageLoading.ariaLabel} role="status">
                 {[0, 1, 2].map((i) => (
                     <span
                         key={i}
@@ -62,8 +85,9 @@ function PageFallback() {
     )
 }
 
-export function App() {
+function AppShell() {
     const location = useLocation()
+    const { t } = useLanguage()
     const isActive = (path: string) => location.pathname === path
 
     return (
@@ -71,12 +95,14 @@ export function App() {
         <ScrollToTop />
         <div style={{ background: '#0a0a0a', minHeight: '100vh', width: '100%', color: '#fff', display: 'flex', flexDirection: 'column' }}>
             {/* Header / Navbar */}
-            <header style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                padding: '20px 5%', 
-                background: 'rgba(10, 10, 10, 0.85)', 
+            <header style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                rowGap: '10px',
+                padding: '20px 5%',
+                background: 'rgba(10, 10, 10, 0.85)',
                 backdropFilter: 'blur(12px)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                 position: 'sticky',
@@ -90,16 +116,16 @@ export function App() {
                     <span>PROTEIN<span style={{ color: '#ff5722' }}>3D</span></span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 <nav style={{ display: 'flex', gap: '10px', background: 'rgba(255,255,255,0.03)', padding: '6px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <Link
                         to="/"
-                        style={{ 
-                            background: isActive('/') ? '#ffffff' : 'transparent', 
-                            color: isActive('/') ? '#000000' : '#a0aec0', 
-                            padding: '10px 22px', 
-                            borderRadius: '20px', 
-                            textDecoration: 'none', 
+                        style={{
+                            background: isActive('/') ? '#ffffff' : 'transparent',
+                            color: isActive('/') ? '#000000' : '#a0aec0',
+                            padding: '10px 22px',
+                            borderRadius: '20px',
+                            textDecoration: 'none',
                             fontWeight: 700,
                             fontSize: '13px',
                             transition: 'all 0.3s ease',
@@ -108,16 +134,16 @@ export function App() {
                             gap: '8px'
                         }}
                     >
-                        <Sparkles size={14} /> Ana Sayfa
+                        <Sparkles size={14} /> {t.nav.home}
                     </Link>
-                    <Link 
+                    <Link
                         to="/nutrition"
-                        style={{ 
-                            background: isActive('/nutrition') ? '#ffffff' : 'transparent', 
-                            color: isActive('/nutrition') ? '#000000' : '#a0aec0', 
-                            padding: '10px 22px', 
-                            borderRadius: '20px', 
-                            textDecoration: 'none', 
+                        style={{
+                            background: isActive('/nutrition') ? '#ffffff' : 'transparent',
+                            color: isActive('/nutrition') ? '#000000' : '#a0aec0',
+                            padding: '10px 22px',
+                            borderRadius: '20px',
+                            textDecoration: 'none',
                             fontWeight: 700,
                             fontSize: '13px',
                             transition: 'all 0.3s ease',
@@ -126,16 +152,16 @@ export function App() {
                             gap: '8px'
                         }}
                     >
-                        <Activity size={14} /> Beslenme Bilimi
+                        <Activity size={14} /> {t.nav.nutrition}
                     </Link>
-                    <Link 
+                    <Link
                         to="/contact"
-                        style={{ 
-                            background: isActive('/contact') ? '#ffffff' : 'transparent', 
-                            color: isActive('/contact') ? '#000000' : '#a0aec0', 
-                            padding: '10px 22px', 
-                            borderRadius: '20px', 
-                            textDecoration: 'none', 
+                        style={{
+                            background: isActive('/contact') ? '#ffffff' : 'transparent',
+                            color: isActive('/contact') ? '#000000' : '#a0aec0',
+                            padding: '10px 22px',
+                            borderRadius: '20px',
+                            textDecoration: 'none',
                             fontWeight: 700,
                             fontSize: '13px',
                             transition: 'all 0.3s ease',
@@ -144,9 +170,10 @@ export function App() {
                             gap: '8px'
                         }}
                     >
-                        <Mail size={14} /> İletişim
+                        <Mail size={14} /> {t.nav.contact}
                     </Link>
                 </nav>
+                <LanguageToggle />
                 <CartButton />
                 </div>
             </header>
@@ -168,6 +195,14 @@ export function App() {
             <CheckoutModal />
         </div>
         </CartProvider>
+    )
+}
+
+export function App() {
+    return (
+        <LanguageProvider>
+            <AppShell />
+        </LanguageProvider>
     )
 }
 

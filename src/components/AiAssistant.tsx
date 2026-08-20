@@ -3,12 +3,15 @@ import type { MouseEvent } from 'react'
 import gsap from 'gsap'
 import { Bot, Send, Sparkles, X } from 'lucide-react'
 import { srOnlyStyle } from '../utils/a11y'
+import { useLanguage } from '../hooks/useLanguage'
 import { SplineRobot } from './SplineRobot'
 
 // Sitede her sayfada görünen, sağ altta sabit duran AI beslenme asistanı.
-// /api/chat (Vercel serverless function) üzerinden Claude'a bağlanır; API anahtarı
-// tanımlı değilse backend otomatik olarak kural-tabanlı bir demo yanıtına düşer,
-// yani widget anahtarsız da çalışır durumda kalır.
+// /api/chat (Vercel serverless function) üzerinden Claude'a bağlanır; yanıt
+// text/plain chunk'lar halinde STREAM edilir ve mesaj balonu karakter karakter
+// dolar (bkz. sendMessage). API anahtarı tanımlı değilse backend otomatik olarak
+// kural-tabanlı bir demo yanıtına düşer — o da aynı stream deneyimini korumak için
+// kelime kelime akıtılır, yani widget anahtarsız da aynı hisle çalışır.
 //
 // Tasarım notu: "spotlight" (fareyi takip eden ışık) efekti, ibelick/spotlight
 // (21st.dev) bileşeninin fikrinden esinlenildi — ama bu proje shadcn/Tailwind/
@@ -23,16 +26,14 @@ interface ChatMessage {
     text: string
 }
 
-const SUGGESTIONS = ['Hangi aroma bana uygun?', 'Ne zaman içmeliyim?', 'Laktoz intoleransım var, olur mu?']
-
-const WELCOME_MESSAGE: ChatMessage = {
-    role: 'assistant',
-    text: 'Merhaba! Ben PROTEIN3D AI Beslenme Asistanıyım. Aromalar, dozaj veya kullanım zamanlaması hakkında sorabilirsin. 💪',
-}
-
 export function AiAssistant() {
+    const { lang, t } = useLanguage()
     const [isOpen, setIsOpen] = useState(false)
-    const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE])
+    // Karşılama mesajı state'te TUTULMAZ — her render'da güncel dilde üretilir
+    // (bkz. displayMessages). Böylece kullanıcı sohbete hiç başlamadan dil
+    // değiştirirse karşılama metni de anında güncellenir; sohbet başladıktan
+    // sonraki gerçek mesajlar ise gönderildikleri dilde donmuş kalır.
+    const [messages, setMessages] = useState<ChatMessage[]>([])
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -44,6 +45,8 @@ export function AiAssistant() {
     const spotlightRef = useRef<HTMLDivElement>(null)
     const spotlightMove = useRef<{ x: (v: number) => void; y: (v: number) => void } | null>(null)
     const dialogTitleId = useId()
+
+    const displayMessages: ChatMessage[] = messages.length === 0 ? [{ role: 'assistant', text: t.aiAssistant.welcomeMessage }] : messages
 
     // Panel açılınca odağı input'a taşı, GSAP ile hafif bir giriş animasyonu oynat
     useEffect(() => {
@@ -65,7 +68,7 @@ export function AiAssistant() {
         }
     }, [isOpen])
 
-    // Yeni mesaj geldiğinde sohbet alanını en alta kaydır
+    // Yeni mesaj/chunk geldiğinde sohbet alanını en alta kaydır
     useEffect(() => {
         scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
     }, [messages, isLoading])
@@ -105,18 +108,42 @@ export function AiAssistant() {
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: trimmed, history }),
+                body: JSON.stringify({ message: trimmed, history, lang }),
             })
 
             if (!res.ok) {
                 const data = (await res.json().catch(() => null)) as { error?: string } | null
-                throw new Error(data?.error ?? `İstek başarısız oldu (${res.status})`)
+                throw new Error(data?.error ?? t.aiAssistant.genericHttpError(res.status))
+            }
+            if (!res.body) throw new Error(t.aiAssistant.errorMessage)
+
+            const reader = res.body.getReader()
+            const decoder = new TextDecoder()
+            let assistantStarted = false
+
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+                const chunk = decoder.decode(value, { stream: true })
+                if (!chunk) continue
+
+                if (!assistantStarted) {
+                    assistantStarted = true
+                    setIsLoading(false)
+                    setMessages((prev) => [...prev, { role: 'assistant', text: chunk }])
+                } else {
+                    setMessages((prev) => {
+                        const next = [...prev]
+                        const last = next[next.length - 1]
+                        next[next.length - 1] = { ...last, text: last.text + chunk }
+                        return next
+                    })
+                }
             }
 
-            const data = (await res.json()) as { reply: string }
-            setMessages((prev) => [...prev, { role: 'assistant', text: data.reply }])
+            if (!assistantStarted) throw new Error(t.aiAssistant.errorMessage)
         } catch {
-            setError('Şu an bağlanamıyorum. Lütfen birazdan tekrar dene.')
+            setError(t.aiAssistant.errorMessage)
         } finally {
             setIsLoading(false)
         }
@@ -126,7 +153,7 @@ export function AiAssistant() {
         <>
             {/* Yeni asistan cevapları için ekran okuyucu duyurusu */}
             <div aria-live="polite" style={srOnlyStyle}>
-                {isLoading ? 'Asistan yazıyor…' : messages[messages.length - 1]?.role === 'assistant' ? messages[messages.length - 1].text : ''}
+                {isLoading ? t.aiAssistant.typingAnnouncement : messages[messages.length - 1]?.role === 'assistant' ? messages[messages.length - 1].text : ''}
             </div>
 
             {/* Açma/kapama butonu — kapalıyken dikkat çeken bir nabız halkasıyla çevrili */}
@@ -146,7 +173,7 @@ export function AiAssistant() {
                     onClick={() => setIsOpen((v) => !v)}
                     aria-expanded={isOpen}
                     aria-controls="ai-assistant-panel"
-                    aria-label={isOpen ? 'AI Beslenme Asistanını kapat' : 'AI Beslenme Asistanını aç'}
+                    aria-label={isOpen ? t.aiAssistant.closeAriaLabel : t.aiAssistant.openAriaLabel}
                     style={{
                         position: 'relative', width: '58px', height: '58px', borderRadius: '50%', border: 'none',
                         background: isOpen ? '#1a1a1a' : BRAND_COLOR, color: '#fff',
@@ -202,14 +229,14 @@ export function AiAssistant() {
                             <SplineRobot />
                             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, #050505 0%, transparent 55%)', pointerEvents: 'none' }} />
                             <div style={{ position: 'absolute', bottom: '10px', left: '16px', pointerEvents: 'none' }}>
-                                <div id={dialogTitleId} style={{ color: '#fff', fontWeight: 800, fontSize: '14px', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>AI Beslenme Asistanı</div>
-                                <div style={{ color: '#ddd', fontSize: '11px', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>PROTEIN3D · her zaman çevrimiçi</div>
+                                <div id={dialogTitleId} style={{ color: '#fff', fontWeight: 800, fontSize: '14px', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>{t.aiAssistant.title}</div>
+                                <div style={{ color: '#ddd', fontSize: '11px', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>{t.aiAssistant.subtitle}</div>
                             </div>
                         </div>
 
                         {/* Mesaj listesi */}
                         <div ref={scrollRef} style={{ position: 'relative', zIndex: 1, flex: 1, overflowY: 'auto', padding: '16px 16px 8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {messages.map((m, i) => (
+                            {displayMessages.map((m, i) => (
                                 <div
                                     key={i}
                                     className="ai-msg-in"
@@ -261,9 +288,9 @@ export function AiAssistant() {
                         </div>
 
                         {/* Hızlı öneriler — sadece sohbetin başında gösterilir */}
-                        {messages.length === 1 && (
+                        {messages.length === 0 && (
                             <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '6px', padding: '0 16px 12px' }}>
-                                {SUGGESTIONS.map((s) => (
+                                {t.aiAssistant.suggestions.map((s) => (
                                     <button
                                         key={s}
                                         onClick={() => sendMessage(s)}
@@ -284,14 +311,14 @@ export function AiAssistant() {
                             onSubmit={(e) => { e.preventDefault(); sendMessage(input) }}
                             style={{ position: 'relative', zIndex: 1, display: 'flex', gap: '8px', padding: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}
                         >
-                            <label htmlFor="ai-assistant-input" style={srOnlyStyle}>Mesajınız</label>
+                            <label htmlFor="ai-assistant-input" style={srOnlyStyle}>{t.aiAssistant.inputLabel}</label>
                             <input
                                 ref={inputRef}
                                 id="ai-assistant-input"
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder="Bir soru sor…"
+                                placeholder={t.aiAssistant.inputPlaceholder}
                                 maxLength={500}
                                 disabled={isLoading}
                                 style={{
@@ -302,7 +329,7 @@ export function AiAssistant() {
                             <button
                                 type="submit"
                                 disabled={isLoading || !input.trim()}
-                                aria-label="Gönder"
+                                aria-label={t.aiAssistant.sendAriaLabel}
                                 style={{
                                     width: '40px', height: '40px', borderRadius: '12px', border: 'none', flexShrink: 0,
                                     background: input.trim() && !isLoading ? BRAND_COLOR : 'rgba(255,255,255,0.08)',

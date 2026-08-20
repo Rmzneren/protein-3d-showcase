@@ -2,6 +2,7 @@ import { useEffect, useId, useRef } from 'react'
 import gsap from 'gsap'
 import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
+import { useLanguage } from '../hooks/useLanguage'
 import { srOnlyStyle } from '../utils/a11y'
 
 const BRAND_COLOR = '#ff5722'
@@ -10,6 +11,7 @@ const BRAND_COLOR = '#ff5722'
 // Tamamen istemci tarafında, sayfa yenilenince sıfırlanan bir demo sepeti.
 export function CartDrawer() {
     const { items, totalPrice, isCartOpen, closeCart, openCheckout, removeFromCart, updateQuantity } = useCart()
+    const { t } = useLanguage()
     const panelRef = useRef<HTMLDivElement>(null)
     const closeButtonRef = useRef<HTMLButtonElement>(null)
     const titleId = useId()
@@ -54,12 +56,12 @@ export function CartDrawer() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 22px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <ShoppingBag size={20} color={BRAND_COLOR} />
-                        <h2 id={titleId} style={{ color: '#fff', fontSize: '16px', fontWeight: 800, margin: 0 }}>Sepetim</h2>
+                        <h2 id={titleId} style={{ color: '#fff', fontSize: '16px', fontWeight: 800, margin: 0 }}>{t.cart.title}</h2>
                     </div>
                     <button
                         ref={closeButtonRef}
                         onClick={closeCart}
-                        aria-label="Sepeti kapat"
+                        aria-label={t.cart.closeAriaLabel}
                         style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '50%', width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer' }}
                     >
                         <X size={16} />
@@ -69,7 +71,7 @@ export function CartDrawer() {
                 <div style={{ flex: 1, overflowY: 'auto', padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {items.length === 0 ? (
                         <div style={{ textAlign: 'center', color: '#777', marginTop: '60px', fontSize: '13.5px' }}>
-                            Sepetin şu an boş.<br />Bir aroma seçip "Sepete Ekle" ile başla.
+                            {t.cart.emptyLine1}<br />{t.cart.emptyLine2}
                         </div>
                     ) : (
                         items.map(({ flavor, quantity }) => (
@@ -82,7 +84,7 @@ export function CartDrawer() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px' }}>
                                     <button
                                         onClick={() => updateQuantity(flavor.id, quantity - 1)}
-                                        aria-label={`${flavor.title} adedini azalt`}
+                                        aria-label={t.cart.decreaseAria(flavor.title)}
                                         style={{ width: '24px', height: '24px', border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                     >
                                         <Minus size={13} />
@@ -90,7 +92,7 @@ export function CartDrawer() {
                                     <span style={{ color: '#fff', fontSize: '12.5px', fontWeight: 700, minWidth: '14px', textAlign: 'center' }}>{quantity}</span>
                                     <button
                                         onClick={() => updateQuantity(flavor.id, quantity + 1)}
-                                        aria-label={`${flavor.title} adedini artır`}
+                                        aria-label={t.cart.increaseAria(flavor.title)}
                                         style={{ width: '24px', height: '24px', border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                     >
                                         <Plus size={13} />
@@ -98,7 +100,7 @@ export function CartDrawer() {
                                 </div>
                                 <button
                                     onClick={() => removeFromCart(flavor.id)}
-                                    aria-label={`${flavor.title} ürününü sepetten çıkar`}
+                                    aria-label={t.cart.removeAria(flavor.title)}
                                     style={{ border: 'none', background: 'transparent', color: '#666', cursor: 'pointer', padding: '4px' }}
                                 >
                                     <Trash2 size={15} />
@@ -111,7 +113,7 @@ export function CartDrawer() {
                 {items.length > 0 && (
                     <div style={{ padding: '18px 22px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', fontSize: '14px' }}>
-                            <span style={{ color: '#999' }}>Toplam</span>
+                            <span style={{ color: '#999' }}>{t.cart.totalLabel}</span>
                             <span style={{ color: '#fff', fontWeight: 800, fontSize: '17px' }}>{totalPrice}₺</span>
                         </div>
                         <button
@@ -121,15 +123,15 @@ export function CartDrawer() {
                                 color: '#fff', fontWeight: 800, fontSize: '13.5px', letterSpacing: '0.5px', cursor: 'pointer',
                             }}
                         >
-                            Ödemeye Geç
+                            {t.cart.checkoutButton}
                         </button>
                         <p style={{ margin: '10px 0 0', textAlign: 'center', color: '#555', fontSize: '10.5px' }}>
-                            Bu bir portföy demosudur — gerçek bir ödeme alınmaz.
+                            {t.cart.disclaimer}
                         </p>
                     </div>
                 )}
                 <div aria-live="polite" style={srOnlyStyle}>
-                    {items.length > 0 ? `Sepette ${items.length} farklı ürün, toplam ${totalPrice} lira` : ''}
+                    {items.length > 0 ? t.cart.liveRegion(items.length, totalPrice) : ''}
                 </div>
             </div>
         </>

@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Sparkles, Globe, Share2, MessageCircle, Mail, MapPin, Phone } from 'lucide-react'
+import { useLanguage } from '../hooks/useLanguage'
+
+const SOCIAL_ICONS = [Globe, Share2, MessageCircle]
 
 // Site genelinde her sayfanın altında görünen ortak footer.
 export function Footer() {
+    const { t } = useLanguage()
     return (
         <footer style={{
             width: '100%',
@@ -27,26 +31,26 @@ export function Footer() {
                         <span>PROTEIN<span style={{ color: '#ff5722' }}>3D</span></span>
                     </div>
                     <p style={{ color: '#8a8a8a', fontSize: '14px', lineHeight: 1.7, maxWidth: '280px' }}>
-                        Laboratuvar kalitesinde saf whey protein formülleri. Performansınız için tasarlandı, lezzetiniz için mükemmelleştirildi.
+                        {t.footer.brandBlurb}
                     </p>
                 </div>
 
                 {/* Hızlı Bağlantılar */}
                 <div>
                     <h4 style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#fff', marginBottom: '18px' }}>
-                        Hızlı Bağlantılar
+                        {t.footer.quickLinksTitle}
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <Link to="/" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>Ana Sayfa</Link>
-                        <Link to="/nutrition" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>Beslenme Bilimi</Link>
-                        <Link to="/contact" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>İletişim</Link>
+                        <Link to="/" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.home}</Link>
+                        <Link to="/nutrition" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.nutrition}</Link>
+                        <Link to="/contact" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.contact}</Link>
                     </div>
                 </div>
 
                 {/* İletişim */}
                 <div>
                     <h4 style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#fff', marginBottom: '18px' }}>
-                        İletişim
+                        {t.footer.contactTitle}
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#8a8a8a', fontSize: '14px' }}>
@@ -56,7 +60,7 @@ export function Footer() {
                             <Phone size={15} /> +90 555 000 00 00
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#8a8a8a', fontSize: '14px' }}>
-                            <MapPin size={15} /> Tekirdağ, Türkiye
+                            <MapPin size={15} /> {t.contact.methods[2].value}
                         </span>
                     </div>
                 </div>
@@ -64,19 +68,15 @@ export function Footer() {
                 {/* Sosyal Medya */}
                 <div>
                     <h4 style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: '#fff', marginBottom: '18px' }}>
-                        Bizi Takip Edin
+                        {t.footer.followTitle}
                     </h4>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        {[
-                            { Icon: Globe, label: 'Web sitemiz' },
-                            { Icon: Share2, label: 'Bizi paylaşın' },
-                            { Icon: MessageCircle, label: 'Bize mesaj gönderin' },
-                        ].map(({ Icon, label }, i) => (
+                        {SOCIAL_ICONS.map((Icon, i) => (
                             <a
                                 key={i}
                                 href="#"
                                 onClick={(e) => e.preventDefault()}
-                                aria-label={label}
+                                aria-label={t.footer.socials[i].label}
                                 style={{
                                     width: '38px', height: '38px', borderRadius: '50%',
                                     background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
@@ -103,10 +103,10 @@ export function Footer() {
                 gap: '12px'
             }}>
                 <span style={{ color: '#555', fontSize: '12px' }}>
-                    © {new Date().getFullYear()} PROTEIN3D. Tüm hakları saklıdır.
+                    {t.footer.copyright(new Date().getFullYear())}
                 </span>
                 <span style={{ color: '#555', fontSize: '12px' }}>
-                    Kas gelişiminiz için saf güç, saf lezzet.
+                    {t.footer.tagline}
                 </span>
             </div>
         </footer>

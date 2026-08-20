@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import gsap from 'gsap'
 import { Check, ChevronLeft, Lock, X } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
+import { useLanguage } from '../hooks/useLanguage'
 import { AnimatedCreditCard } from './AnimatedCreditCard'
 import { srOnlyStyle } from '../utils/a11y'
 
@@ -28,6 +29,7 @@ function formatExpiry(raw: string) {
 // herhangi bir sunucuya gönderilmez; bu gerçek bir ödeme altyapısı DEĞİLDİR.
 export function CheckoutModal() {
     const { items, totalPrice, isCheckoutOpen, closeCheckout, clearCart } = useCart()
+    const { t } = useLanguage()
     const [step, setStep] = useState<Step>('shipping')
     const [shipping, setShipping] = useState({ name: '', address: '', city: '', zip: '', email: '' })
     const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' })
@@ -108,7 +110,7 @@ export function CheckoutModal() {
                 {!isProcessing && (
                     <button
                         onClick={handleClose}
-                        aria-label="Kapat"
+                        aria-label={t.checkout.closeAriaLabel}
                         style={{ position: 'absolute', top: '18px', right: '18px', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer' }}
                     >
                         <X size={15} />
@@ -116,16 +118,16 @@ export function CheckoutModal() {
                 )}
 
                 <div aria-live="polite" style={srOnlyStyle}>
-                    {step === 'shipping' && 'Teslimat bilgileri adımı'}
-                    {step === 'payment' && 'Ödeme bilgileri adımı'}
-                    {step === 'success' && `Sipariş tamamlandı, sipariş numarası ${orderNumber}`}
+                    {step === 'shipping' && t.checkout.liveShipping}
+                    {step === 'payment' && t.checkout.livePayment}
+                    {step === 'success' && t.checkout.liveSuccess(orderNumber)}
                 </div>
 
                 {step !== 'success' && (
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '22px' }}>
                         {(['shipping', 'payment'] as Step[]).map((s, i) => (
                             <div key={s} style={{ flex: 1, height: '3px', borderRadius: '2px', background: step === s || (s === 'shipping' && step === 'payment') ? BRAND_COLOR : 'rgba(255,255,255,0.1)' }} aria-hidden="true">
-                                <span style={srOnlyStyle}>{i === 0 ? 'Adım 1: Teslimat' : 'Adım 2: Ödeme'}</span>
+                                <span style={srOnlyStyle}>{i === 0 ? t.checkout.stepShippingLabel : t.checkout.stepPaymentLabel}</span>
                             </div>
                         ))}
                     </div>
@@ -134,31 +136,31 @@ export function CheckoutModal() {
                 {/* --- ADIM 1: TESLİMAT --- */}
                 {step === 'shipping' && (
                     <>
-                        <h2 id={titleId} style={{ color: '#fff', fontSize: '18px', fontWeight: 800, marginBottom: '4px' }}>Teslimat Bilgileri</h2>
-                        <p style={{ color: '#888', fontSize: '12.5px', marginBottom: '20px' }}>Toplam {items.length} ürün · {totalPrice}₺</p>
+                        <h2 id={titleId} style={{ color: '#fff', fontSize: '18px', fontWeight: 800, marginBottom: '4px' }}>{t.checkout.shipping.title}</h2>
+                        <p style={{ color: '#888', fontSize: '12.5px', marginBottom: '20px' }}>{t.checkout.shipping.summary(items.length, totalPrice)}</p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                             <div>
-                                <label style={labelStyle} htmlFor="ship-name">Ad Soyad</label>
-                                <input ref={firstFieldRef} id="ship-name" style={inputStyle} value={shipping.name} onChange={(e) => setShipping((s) => ({ ...s, name: e.target.value }))} placeholder="Ayşe Yılmaz" />
+                                <label style={labelStyle} htmlFor="ship-name">{t.checkout.shipping.nameLabel}</label>
+                                <input ref={firstFieldRef} id="ship-name" style={inputStyle} value={shipping.name} onChange={(e) => setShipping((s) => ({ ...s, name: e.target.value }))} placeholder={t.checkout.shipping.namePlaceholder} />
                             </div>
                             <div>
-                                <label style={labelStyle} htmlFor="ship-address">Adres</label>
-                                <input id="ship-address" style={inputStyle} value={shipping.address} onChange={(e) => setShipping((s) => ({ ...s, address: e.target.value }))} placeholder="Mahalle, cadde, no" />
+                                <label style={labelStyle} htmlFor="ship-address">{t.checkout.shipping.addressLabel}</label>
+                                <input id="ship-address" style={inputStyle} value={shipping.address} onChange={(e) => setShipping((s) => ({ ...s, address: e.target.value }))} placeholder={t.checkout.shipping.addressPlaceholder} />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                 <div>
-                                    <label style={labelStyle} htmlFor="ship-city">Şehir</label>
-                                    <input id="ship-city" style={inputStyle} value={shipping.city} onChange={(e) => setShipping((s) => ({ ...s, city: e.target.value }))} placeholder="İstanbul" />
+                                    <label style={labelStyle} htmlFor="ship-city">{t.checkout.shipping.cityLabel}</label>
+                                    <input id="ship-city" style={inputStyle} value={shipping.city} onChange={(e) => setShipping((s) => ({ ...s, city: e.target.value }))} placeholder={t.checkout.shipping.cityPlaceholder} />
                                 </div>
                                 <div>
-                                    <label style={labelStyle} htmlFor="ship-zip">Posta Kodu</label>
-                                    <input id="ship-zip" style={inputStyle} value={shipping.zip} onChange={(e) => setShipping((s) => ({ ...s, zip: e.target.value }))} placeholder="34000" />
+                                    <label style={labelStyle} htmlFor="ship-zip">{t.checkout.shipping.zipLabel}</label>
+                                    <input id="ship-zip" style={inputStyle} value={shipping.zip} onChange={(e) => setShipping((s) => ({ ...s, zip: e.target.value }))} placeholder={t.checkout.shipping.zipPlaceholder} />
                                 </div>
                             </div>
                             <div>
-                                <label style={labelStyle} htmlFor="ship-email">E-posta</label>
-                                <input id="ship-email" type="email" style={inputStyle} value={shipping.email} onChange={(e) => setShipping((s) => ({ ...s, email: e.target.value }))} placeholder="ornek@mail.com" />
+                                <label style={labelStyle} htmlFor="ship-email">{t.checkout.shipping.emailLabel}</label>
+                                <input id="ship-email" type="email" style={inputStyle} value={shipping.email} onChange={(e) => setShipping((s) => ({ ...s, email: e.target.value }))} placeholder={t.checkout.shipping.emailPlaceholder} />
                             </div>
                         </div>
 
@@ -171,7 +173,7 @@ export function CheckoutModal() {
                                 fontWeight: 800, fontSize: '13.5px', cursor: shippingValid ? 'pointer' : 'default',
                             }}
                         >
-                            Ödemeye Devam Et
+                            {t.checkout.shipping.continueButton}
                         </button>
                     </>
                 )}
@@ -180,35 +182,35 @@ export function CheckoutModal() {
                 {step === 'payment' && (
                     <>
                         <button onClick={() => setStep('shipping')} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: '#999', fontSize: '12px', cursor: 'pointer', marginBottom: '14px', padding: 0 }}>
-                            <ChevronLeft size={14} /> Teslimat bilgilerine dön
+                            <ChevronLeft size={14} /> {t.checkout.payment.backButton}
                         </button>
 
-                        <h2 style={{ color: '#fff', fontSize: '18px', fontWeight: 800, marginBottom: '18px' }}>Ödeme Bilgileri</h2>
+                        <h2 style={{ color: '#fff', fontSize: '18px', fontWeight: 800, marginBottom: '18px' }}>{t.checkout.payment.title}</h2>
 
                         <AnimatedCreditCard cardNumber={card.number} cardName={card.name} expiry={card.expiry} cvv={card.cvv} isFlipped={isCvvFocused} />
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '22px' }}>
                             <div>
-                                <label style={labelStyle} htmlFor="card-number">Kart Numarası</label>
+                                <label style={labelStyle} htmlFor="card-number">{t.checkout.payment.cardNumberLabel}</label>
                                 <input
                                     id="card-number" style={inputStyle} inputMode="numeric" placeholder="0000 0000 0000 0000"
                                     value={card.number} onChange={(e) => setCard((c) => ({ ...c, number: formatCardNumber(e.target.value) }))}
                                 />
                             </div>
                             <div>
-                                <label style={labelStyle} htmlFor="card-name">Kart Üzerindeki İsim</label>
-                                <input id="card-name" style={inputStyle} value={card.name} onChange={(e) => setCard((c) => ({ ...c, name: e.target.value }))} placeholder="Ayşe Yılmaz" />
+                                <label style={labelStyle} htmlFor="card-name">{t.checkout.payment.cardNameLabel}</label>
+                                <input id="card-name" style={inputStyle} value={card.name} onChange={(e) => setCard((c) => ({ ...c, name: e.target.value }))} placeholder={t.checkout.payment.cardNamePlaceholder} />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                 <div>
-                                    <label style={labelStyle} htmlFor="card-expiry">Son Kullanma (AA/YY)</label>
+                                    <label style={labelStyle} htmlFor="card-expiry">{t.checkout.payment.expiryLabel}</label>
                                     <input
                                         id="card-expiry" style={inputStyle} inputMode="numeric" placeholder="AA/YY"
                                         value={card.expiry} onChange={(e) => setCard((c) => ({ ...c, expiry: formatExpiry(e.target.value) }))}
                                     />
                                 </div>
                                 <div>
-                                    <label style={labelStyle} htmlFor="card-cvv">CVV</label>
+                                    <label style={labelStyle} htmlFor="card-cvv">{t.checkout.payment.cvvLabel}</label>
                                     <input
                                         id="card-cvv" style={inputStyle} inputMode="numeric" placeholder="123" maxLength={3}
                                         value={card.cvv}
@@ -233,16 +235,16 @@ export function CheckoutModal() {
                             {isProcessing ? (
                                 <>
                                     <span className="ai-spin" style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block' }} />
-                                    İşleniyor…
+                                    {t.checkout.payment.processing}
                                 </>
                             ) : (
                                 <>
-                                    <Lock size={14} /> {totalPrice}₺ Öde
+                                    <Lock size={14} /> {t.checkout.payment.payButton(totalPrice)}
                                 </>
                             )}
                         </button>
                         <p style={{ margin: '10px 0 0', textAlign: 'center', color: '#555', fontSize: '10.5px' }}>
-                            Bu bir portföy demosudur — kart bilgilerin hiçbir yere gönderilmez, gerçek bir işlem gerçekleşmez.
+                            {t.checkout.payment.disclaimer}
                         </p>
                     </>
                 )}
@@ -256,17 +258,17 @@ export function CheckoutModal() {
                         >
                             <Check size={30} color="#4caf50" />
                         </div>
-                        <h2 style={{ color: '#fff', fontSize: '19px', fontWeight: 800, marginBottom: '8px' }}>Siparişin Alındı!</h2>
-                        <p style={{ color: '#999', fontSize: '13px', marginBottom: '4px' }}>Sipariş numaran:</p>
+                        <h2 style={{ color: '#fff', fontSize: '19px', fontWeight: 800, marginBottom: '8px' }}>{t.checkout.success.title}</h2>
+                        <p style={{ color: '#999', fontSize: '13px', marginBottom: '4px' }}>{t.checkout.success.orderNumberLabel}</p>
                         <p style={{ color: BRAND_COLOR, fontSize: '15px', fontWeight: 800, fontFamily: 'monospace', marginBottom: '20px' }}>{orderNumber}</p>
                         <p style={{ color: '#666', fontSize: '11.5px', marginBottom: '24px', lineHeight: 1.6 }}>
-                            Bu bir portföy demosudur — gerçek bir sipariş oluşturulmadı, hiçbir ödeme alınmadı.
+                            {t.checkout.success.disclaimer}
                         </p>
                         <button
                             onClick={handleFinish}
                             style={{ width: '100%', padding: '14px', borderRadius: '12px', border: 'none', background: BRAND_COLOR, color: '#fff', fontWeight: 800, fontSize: '13.5px', cursor: 'pointer' }}
                         >
-                            Kapat
+                            {t.checkout.success.closeButton}
                         </button>
                     </div>
                 )}
