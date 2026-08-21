@@ -264,7 +264,7 @@ const tr: Dictionary = {
             eyebrow: 'Basit & Etkili',
             title: 'Nasıl Kullanılır?',
             steps: [
-                { title: 'KARIŞTIR', desc: "Bir ölçek PROTEIN3D'yi 250ml su ya da süt ile shaker içinde karıştırın." },
+                { title: 'KARIŞTIR', desc: "Bir ölçek RV3'ü 250ml su ya da süt ile shaker içinde karıştırın." },
                 { title: 'DOĞRU ZAMANDA TÜKET', desc: 'Maksimum verim için antrenman öncesi veya sonrası 30 dakika içinde için.' },
                 { title: 'SONUÇLARI GÖR', desc: 'Düzenli kullanımla kas gelişiminizi ve toparlanmanızı hızlandırın.' },
             ],
@@ -288,7 +288,7 @@ const tr: Dictionary = {
             titlePrefix: 'Beslenme Bilimi: ',
             titleHighlight: 'Saf Güç',
             body: 'Laboratuvar ortamında geliştirilen formülümüz, vücudunuzun ihtiyaç duyduğu her şeyi en saf haliyle sunar — kaynağından şişeye kadar her adım test edilir.',
-            imageAlt: 'PROTEIN3D ürün şişesi',
+            imageAlt: 'RV3 ürün şişesi',
         },
         features: [
             { title: 'Hızlı Emilim', desc: 'Mikro-filtreli teknoloji ile kaslarınıza saniyeler içinde ulaşır.' },
@@ -323,9 +323,9 @@ const tr: Dictionary = {
             ],
         },
         comparison: {
-            title: 'PROTEIN3D vs. Standart Whey',
+            title: 'RV3 vs. Standart Whey',
             subtitle: 'Aynı ölçek, çok farklı sonuç.',
-            ourLabel: 'PROTEIN3D',
+            ourLabel: 'RV3',
             theirLabel: 'Standart Whey',
             rows: [{ label: 'Protein (ölçek başına)' }, { label: 'BCAA' }, { label: 'Şeker' }],
         },
@@ -353,7 +353,7 @@ const tr: Dictionary = {
                 photoPreviewAlt: 'Eklediğiniz fotoğrafın önizlemesi',
                 photoRemoveAriaLabel: 'Fotoğrafı kaldır',
                 submit: 'Yorumu Paylaş',
-                defaultRole: 'PROTEIN3D Kullanıcısı',
+                defaultRole: 'RV3 Kullanıcısı',
             },
         },
         faq: {
@@ -416,7 +416,7 @@ const tr: Dictionary = {
         story: {
             title: 'Nasıl Başladık?',
             paragraphs: [
-                'Kurucumuz, yıllarca amatör vücut geliştirme camiasında koçluk yaptıktan sonra piyasadaki çoğu proteinin etiketinde yazanla içeriğinin örtüşmediğini fark etti. Bağımsız laboratuvar testlerinden geçmemiş, şeffaf olmayan formüllere karşı bir alternatif yaratma fikriyle PROTEIN3D doğdu.',
+                'Kurucumuz, yıllarca amatör vücut geliştirme camiasında koçluk yaptıktan sonra piyasadaki çoğu proteinin etiketinde yazanla içeriğinin örtüşmediğini fark etti. Bağımsız laboratuvar testlerinden geçmemiş, şeffaf olmayan formüllere karşı bir alternatif yaratma fikriyle RV3 doğdu.',
                 'Bugün her parti, üretim hattından çıkmadan önce 200’den fazla parametrede bağımsız olarak test ediliyor. Amacımız hâlâ aynı: etikette ne yazıyorsa şişede tam olarak onun olduğundan emin olmak.',
             ],
         },
@@ -500,7 +500,7 @@ const tr: Dictionary = {
         followTitle: 'Bizi Takip Edin',
         helpLinkLabel: 'Yardım Merkezi',
         socials: [{ label: 'Web sitemiz' }, { label: 'Bizi paylaşın' }, { label: 'Bize mesaj gönderin' }],
-        copyright: (year) => `© ${year} PROTEIN3D. Tüm hakları saklıdır.`,
+        copyright: (year) => `© ${year} RV3. Tüm hakları saklıdır.`,
         tagline: 'Kas gelişiminiz için saf güç, saf lezzet.',
     },
     cart: {
@@ -559,10 +559,10 @@ const tr: Dictionary = {
     },
     aiAssistant: {
         title: 'AI Beslenme Asistanı',
-        subtitle: 'PROTEIN3D · her zaman çevrimiçi',
+        subtitle: 'RV3 · her zaman çevrimiçi',
         openAriaLabel: 'AI Beslenme Asistanını aç',
         closeAriaLabel: 'AI Beslenme Asistanını kapat',
-        welcomeMessage: 'Merhaba! Ben PROTEIN3D AI Beslenme Asistanıyım. Aromalar, dozaj veya kullanım zamanlaması hakkında sorabilirsin. 💪',
+        welcomeMessage: 'Merhaba! Ben RV3 AI Beslenme Asistanıyım. Aromalar, dozaj veya kullanım zamanlaması hakkında sorabilirsin. 💪',
         suggestions: ['Hangi aroma bana uygun?', 'Ne zaman içmeliyim?', 'Laktoz intoleransım var, olur mu?'],
         inputLabel: 'Mesajınız',
         inputPlaceholder: 'Bir soru sor…',
@@ -600,7 +600,7 @@ const en: Dictionary = {
             eyebrow: 'Simple & Effective',
             title: 'How to Use',
             steps: [
-                { title: 'MIX', desc: 'Mix one scoop of PROTEIN3D with 250ml of water or milk in a shaker.' },
+                { title: 'MIX', desc: 'Mix one scoop of RV3 with 250ml of water or milk in a shaker.' },
                 { title: 'DRINK AT THE RIGHT TIME', desc: 'For maximum effect, drink within 30 minutes before or after your workout.' },
                 { title: 'SEE THE RESULTS', desc: 'Speed up your muscle growth and recovery with regular use.' },
             ],
@@ -624,7 +624,7 @@ const en: Dictionary = {
             titlePrefix: 'Nutrition Science: ',
             titleHighlight: 'Pure Power',
             body: 'Developed in a laboratory setting, our formula delivers everything your body needs in its purest form — every step from source to bottle is tested.',
-            imageAlt: 'PROTEIN3D product bottle',
+            imageAlt: 'RV3 product bottle',
         },
         features: [
             { title: 'Fast Absorption', desc: 'Micro-filtered technology reaches your muscles within seconds.' },
@@ -659,9 +659,9 @@ const en: Dictionary = {
             ],
         },
         comparison: {
-            title: 'PROTEIN3D vs. Standard Whey',
+            title: 'RV3 vs. Standard Whey',
             subtitle: 'Same scoop, very different result.',
-            ourLabel: 'PROTEIN3D',
+            ourLabel: 'RV3',
             theirLabel: 'Standard Whey',
             rows: [{ label: 'Protein (per scoop)' }, { label: 'BCAA' }, { label: 'Sugar' }],
         },
@@ -689,7 +689,7 @@ const en: Dictionary = {
                 photoPreviewAlt: 'Preview of your added photo',
                 photoRemoveAriaLabel: 'Remove photo',
                 submit: 'Submit Review',
-                defaultRole: 'PROTEIN3D User',
+                defaultRole: 'RV3 User',
             },
         },
         faq: {
@@ -752,7 +752,7 @@ const en: Dictionary = {
         story: {
             title: 'How It Started',
             paragraphs: [
-                "After years of coaching in the amateur bodybuilding community, our founder noticed that what was on the label rarely matched what was actually in the tub. PROTEIN3D was born from the idea of building an alternative to opaque, untested formulas — one that was independently verified from day one.",
+                "After years of coaching in the amateur bodybuilding community, our founder noticed that what was on the label rarely matched what was actually in the tub. RV3 was born from the idea of building an alternative to opaque, untested formulas — one that was independently verified from day one.",
                 "Today, every batch is independently tested across 200+ parameters before it ever leaves the production line. Our goal hasn't changed: what's on the label is exactly what's in the bottle.",
             ],
         },
@@ -836,7 +836,7 @@ const en: Dictionary = {
         followTitle: 'Follow Us',
         helpLinkLabel: 'Help Center',
         socials: [{ label: 'Our website' }, { label: 'Share us' }, { label: 'Message us' }],
-        copyright: (year) => `© ${year} PROTEIN3D. All rights reserved.`,
+        copyright: (year) => `© ${year} RV3. All rights reserved.`,
         tagline: 'Pure power, pure taste, for your muscle growth.',
     },
     cart: {
@@ -895,10 +895,10 @@ const en: Dictionary = {
     },
     aiAssistant: {
         title: 'AI Nutrition Assistant',
-        subtitle: 'PROTEIN3D · always online',
+        subtitle: 'RV3 · always online',
         openAriaLabel: 'Open AI Nutrition Assistant',
         closeAriaLabel: 'Close AI Nutrition Assistant',
-        welcomeMessage: "Hi! I'm the PROTEIN3D AI Nutrition Assistant. Ask me about flavors, dosage, or timing. 💪",
+        welcomeMessage: "Hi! I'm the RV3 AI Nutrition Assistant. Ask me about flavors, dosage, or timing. 💪",
         suggestions: ['Which flavor suits me?', 'When should I drink it?', "I'm lactose intolerant, is that okay?"],
         inputLabel: 'Your message',
         inputPlaceholder: 'Ask a question…',

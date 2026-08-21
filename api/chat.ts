@@ -4,7 +4,7 @@ import { localizeFlavors } from '../src/data/flavors.js'
 import type { Lang } from '../src/i18n/types.js'
 
 // ==========================================================
-// PROTEIN3D AI BESLENME ASİSTANI — Vercel Serverless Function
+// RV3 AI BESLENME ASİSTANI — Vercel Serverless Function
 // ==========================================================
 // API anahtarı (ANTHROPIC_API_KEY) sadece bu sunucu tarafında okunur, istemciye
 // hiç gönderilmez. Anahtar tanımlı değilse fonksiyon kural-tabanlı bir demo
@@ -56,10 +56,10 @@ function buildSystemPrompt(lang: Lang): string {
 
     if (lang === 'en') {
         return [
-            'You are the PROTEIN3D brand\'s friendly nutrition assistant. Always answer in English, in short replies (at most 3-4 sentences).',
+            'You are the RV3 brand\'s friendly nutrition assistant. Always answer in English, in short replies (at most 3-4 sentences).',
             'Recommend the most suitable flavor and usage timing/dosage to the user.',
             'Do not give medical diagnoses; for serious health concerns, gently suggest consulting a doctor/dietitian.',
-            'Only discuss PROTEIN3D products and general sports nutrition; politely redirect off-topic questions back to the products.',
+            'Only discuss RV3 products and general sports nutrition; politely redirect off-topic questions back to the products.',
             '',
             'Available flavors:',
             flavorLines,
@@ -69,10 +69,10 @@ function buildSystemPrompt(lang: Lang): string {
     }
 
     return [
-        'Sen PROTEIN3D markasının Türkçe konuşan, samimi ve kısa cevaplar veren beslenme asistanısın.',
+        'Sen RV3 markasının Türkçe konuşan, samimi ve kısa cevaplar veren beslenme asistanısın.',
         'Kullanıcıya en uygun aromayı ve kullanım zamanlamasını/dozajını öner. Cevapların en fazla 3-4 cümle olsun.',
         'Tıbbi teşhis koyma; ciddi sağlık şikayetlerinde nazikçe bir doktora/diyetisyene danışmasını söyle.',
-        'Sadece PROTEIN3D ürünleri ve genel spor beslenmesi hakkında konuş; alakasız konularda kibarca ürünlere geri dön.',
+        'Sadece RV3 ürünleri ve genel spor beslenmesi hakkında konuş; alakasız konularda kibarca ürünlere geri dön.',
         '',
         'Mevcut aromalar:',
         flavorLines,

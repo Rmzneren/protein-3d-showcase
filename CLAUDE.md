@@ -17,7 +17,7 @@ There is no test suite/framework configured in this project (no test runner in `
 
 ## Architecture
 
-This is a single-page marketing/showcase site for a whey protein brand ("PROTEIN3D"), built with React 19 + TypeScript + Vite, routed client-side via `react-router-dom`, and animated with GSAP. UI copy and content is in Turkish. It deploys to Vercel (`vercel.json`), combining a static SPA build with one serverless function.
+This is a single-page marketing/showcase site for a whey protein brand ("RV3"), built with React 19 + TypeScript + Vite, routed client-side via `react-router-dom`, and animated with GSAP. UI copy and content is in Turkish. It deploys to Vercel (`vercel.json`), combining a static SPA build with one serverless function.
 
 - **Entry / shell**: `src/main.tsx` mounts `<App>` inside `<BrowserRouter>`. `src/App.tsx` wraps everything in `<CartProvider>` and renders the sticky navbar (with active-route highlighting via `useLocation`, and a cart button showing item count), a `<Routes>` block wiring three route-level-code-split pages (`lazy()` + `Suspense`): `/` → `HomePage`, `/nutrition` → `NutritionPage`, `/contact` → `ContactPage`, then `Footer`, `AiAssistant`, `CartDrawer`, and `CheckoutModal` rendered outside `<Routes>` so they persist across page navigation.
 - **Styling**: Almost all styling is inline `style={{...}}` objects directly on JSX elements rather than CSS classes/modules — `src/App.css`/`src/index.css` only carry minimal base styles (plus a few animation keyframes referenced by className, e.g. `ai-bounce`, `ai-pulse-ring`, `ai-border-shimmer`). When editing UI, follow this inline-style convention rather than introducing a new styling system.

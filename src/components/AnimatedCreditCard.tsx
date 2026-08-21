@@ -15,7 +15,7 @@ function detectBrand(cardNumber: string): { label: string; gradient: string } {
     const digits = cardNumber.replace(/\s/g, '')
     if (digits.startsWith('4')) return { label: 'VISA TARZI', gradient: 'linear-gradient(135deg, #1a3a8f, #2f5fd1)' }
     if (/^5[1-5]/.test(digits)) return { label: 'MASTER TARZI', gradient: 'linear-gradient(135deg, #7a1f1f, #b3401f)' }
-    return { label: 'PROTEIN3D KART', gradient: 'linear-gradient(135deg, #1a1a1a, #3a1a10)' }
+    return { label: 'RV3 KART', gradient: 'linear-gradient(135deg, #1a1a1a, #3a1a10)' }
 }
 
 export function AnimatedCreditCard({ cardNumber, cardName, expiry, cvv, isFlipped }: AnimatedCreditCardProps) {

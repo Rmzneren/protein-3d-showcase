@@ -115,7 +115,7 @@ function AppShell() {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 900, letterSpacing: '1.5px' }}>
                     <Sparkles size={22} color="#ff5722" />
-                    <span>PROTEIN<span style={{ color: '#ff5722' }}>3D</span></span>
+                    <span>RV<span style={{ color: '#ff5722' }}>3</span></span>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>

@@ -28,7 +28,7 @@ export function Footer() {
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 900, letterSpacing: '1.5px', marginBottom: '16px' }}>
                         <Sparkles size={20} color="#ff5722" />
-                        <span>PROTEIN<span style={{ color: '#ff5722' }}>3D</span></span>
+                        <span>RV<span style={{ color: '#ff5722' }}>3</span></span>
                     </div>
                     <p style={{ color: '#8a8a8a', fontSize: '14px', lineHeight: 1.7, maxWidth: '280px' }}>
                         {t.footer.brandBlurb}

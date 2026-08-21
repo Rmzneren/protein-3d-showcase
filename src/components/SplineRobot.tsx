@@ -8,7 +8,7 @@ import { shouldLoadHeavy3D } from '../utils/deviceCapability'
 // panel ilk kez açıldığında indirilir — sayfa ilk yüklemesini yavaşlatmaz.
 const Spline = lazy(() => import('@splinetool/react-spline'))
 
-// Not: Bu, Spline'ın herkese açık demo sahnelerinden biri — PROTEIN3D'ye özel
+// Not: Bu, Spline'ın herkese açık demo sahnelerinden biri — RV3'e özel
 // tasarlanmış değil. Markaya özel bir robot istenirse Spline editöründe
 // oluşturulup bu URL değiştirilebilir.
 const ROBOT_SCENE_URL = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
