@@ -9,7 +9,7 @@ import { CartProvider } from './context/CartContext'
 import { LanguageProvider } from './context/LanguageContext'
 import { useCart } from './hooks/useCart'
 import { useLanguage } from './hooks/useLanguage'
-import { Sparkles, Activity, Mail, ShoppingBag, Languages } from 'lucide-react'
+import { Sparkles, Activity, Mail, ShoppingBag, Languages, Info, HelpCircle } from 'lucide-react'
 
 // Navbar'daki sepet butonu — dolu ürün sayısını rozet olarak gösterir
 function CartButton() {
@@ -64,8 +64,10 @@ function LanguageToggle() {
 // Rota bazlı kod bölme — her sayfa sadece ziyaret edildiğinde indirilir,
 // ilk yüklemede diğer iki sayfanın kodu hiç indirilmez.
 const HomePage = lazy(() => import('./pages/HomePage').then((m) => ({ default: m.HomePage })))
+const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })))
 const NutritionPage = lazy(() => import('./pages/NutritionPage').then((m) => ({ default: m.NutritionPage })))
 const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })))
+const HelpPage = lazy(() => import('./pages/HelpPage').then((m) => ({ default: m.HelpPage })))
 
 // Sayfa geçişlerinde kod indirilirken gösterilen minimal, marka renginde yükleme göstergesi
 function PageFallback() {
@@ -137,6 +139,24 @@ function AppShell() {
                         <Sparkles size={14} /> {t.nav.home}
                     </Link>
                     <Link
+                        to="/about"
+                        style={{
+                            background: isActive('/about') ? '#ffffff' : 'transparent',
+                            color: isActive('/about') ? '#000000' : '#a0aec0',
+                            padding: '10px 22px',
+                            borderRadius: '20px',
+                            textDecoration: 'none',
+                            fontWeight: 700,
+                            fontSize: '13px',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}
+                    >
+                        <Info size={14} /> {t.nav.about}
+                    </Link>
+                    <Link
                         to="/nutrition"
                         style={{
                             background: isActive('/nutrition') ? '#ffffff' : 'transparent',
@@ -172,6 +192,24 @@ function AppShell() {
                     >
                         <Mail size={14} /> {t.nav.contact}
                     </Link>
+                    <Link
+                        to="/help"
+                        style={{
+                            background: isActive('/help') ? '#ffffff' : 'transparent',
+                            color: isActive('/help') ? '#000000' : '#a0aec0',
+                            padding: '10px 22px',
+                            borderRadius: '20px',
+                            textDecoration: 'none',
+                            fontWeight: 700,
+                            fontSize: '13px',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}
+                    >
+                        <HelpCircle size={14} /> {t.footer.helpLinkLabel}
+                    </Link>
                 </nav>
                 <LanguageToggle />
                 <CartButton />
@@ -183,8 +221,10 @@ function AppShell() {
                 <Suspense fallback={<PageFallback />}>
                     <Routes>
                         <Route path="/" element={<HomePage onSelect={() => {}} />} />
+                        <Route path="/about" element={<AboutPage />} />
                         <Route path="/nutrition" element={<NutritionPage />} />
                         <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/help" element={<HelpPage />} />
                     </Routes>
                 </Suspense>
             </main>

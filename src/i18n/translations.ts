@@ -11,6 +11,7 @@ export interface Dictionary {
     meta: { locale: string }
     nav: {
         home: string
+        about: string
         nutrition: string
         contact: string
         cartAriaWithItems: (count: number) => string
@@ -121,11 +122,47 @@ export interface Dictionary {
             submit: string
         }
     }
+    about: {
+        hero: { eyebrow: string; title: string; body: string }
+        story: { title: string; paragraphs: [string, string] }
+        values: [
+            { title: string; desc: string },
+            { title: string; desc: string },
+            { title: string; desc: string },
+            { title: string; desc: string },
+        ]
+        timeline: {
+            eyebrow: string
+            title: string
+            items: [
+                { year: string; title: string; desc: string },
+                { year: string; title: string; desc: string },
+                { year: string; title: string; desc: string },
+                { year: string; title: string; desc: string },
+            ]
+        }
+        certifications: {
+            title: string
+            items: [{ label: string; desc: string }, { label: string; desc: string }, { label: string; desc: string }, { label: string; desc: string }]
+        }
+        cta: { title: string; body: string; button: string }
+    }
+    help: {
+        hero: { eyebrow: string; title: string; body: string }
+        categories: [
+            { title: string; items: [{ q: string; a: string }, { q: string; a: string }, { q: string; a: string }] },
+            { title: string; items: [{ q: string; a: string }, { q: string; a: string }, { q: string; a: string }] },
+            { title: string; items: [{ q: string; a: string }, { q: string; a: string }, { q: string; a: string }] },
+            { title: string; items: [{ q: string; a: string }, { q: string; a: string }, { q: string; a: string }] },
+        ]
+        cta: { text: string; linkText: string }
+    }
     footer: {
         brandBlurb: string
         quickLinksTitle: string
         contactTitle: string
         followTitle: string
+        helpLinkLabel: string
         socials: [{ label: string }, { label: string }, { label: string }]
         copyright: (year: number) => string
         tagline: string
@@ -204,6 +241,7 @@ const tr: Dictionary = {
     meta: { locale: 'tr-TR' },
     nav: {
         home: 'Ana Sayfa',
+        about: 'Hakkımızda',
         nutrition: 'Beslenme Bilimi',
         contact: 'İletişim',
         cartAriaWithItems: (count) => `Sepeti aç, içinde ${count} ürün var`,
@@ -369,11 +407,98 @@ const tr: Dictionary = {
             submit: 'Gönder',
         },
     },
+    about: {
+        hero: {
+            eyebrow: 'Hikayemiz',
+            title: 'Güçten İlhamla Doğduk',
+            body: '2011 yılında küçük bir laboratuvarda başladık; tek hedefimiz sporcuların güvenebileceği, gerçekten saf bir whey protein üretmekti. Bugün binlerce sporcunun günlük rutininin bir parçasıyız.',
+        },
+        story: {
+            title: 'Nasıl Başladık?',
+            paragraphs: [
+                'Kurucumuz, yıllarca amatör vücut geliştirme camiasında koçluk yaptıktan sonra piyasadaki çoğu proteinin etiketinde yazanla içeriğinin örtüşmediğini fark etti. Bağımsız laboratuvar testlerinden geçmemiş, şeffaf olmayan formüllere karşı bir alternatif yaratma fikriyle PROTEIN3D doğdu.',
+                'Bugün her parti, üretim hattından çıkmadan önce 200’den fazla parametrede bağımsız olarak test ediliyor. Amacımız hâlâ aynı: etikette ne yazıyorsa şişede tam olarak onun olduğundan emin olmak.',
+            ],
+        },
+        values: [
+            { title: 'Bilimsel Titizlik', desc: 'Her formül, piyasaya çıkmadan önce bağımsız laboratuvarlarda kapsamlı testlerden geçer.' },
+            { title: 'Tam Şeffaflık', desc: 'Etiketimizde yazan her rakam, gerçek test sonuçlarını yansıtır — gizli dolgu maddesi yok.' },
+            { title: 'Sürdürülebilir Kaynak', desc: 'Otlatılmış çiftliklerden gelen ham maddeyle çevreye duyarlı bir tedarik zinciri kuruyoruz.' },
+            { title: 'Sporcu Odaklılık', desc: 'Her karar, sahadaki gerçek sporcuların ihtiyaçları düşünülerek alınır.' },
+        ],
+        timeline: {
+            eyebrow: 'Yolculuğumuz',
+            title: 'Kilometre Taşlarımız',
+            items: [
+                { year: '2011', title: 'Kuruluş', desc: 'Küçük bir laboratuvarda, tek bir aroma ve büyük bir hedefle yola çıktık.' },
+                { year: '2014', title: 'İlk Bağımsız Sertifikasyon', desc: 'Formüllerimiz ilk kez bağımsız bir laboratuvar tarafından doping-free onayı aldı.' },
+                { year: '2018', title: 'Tesis Büyümesi', desc: 'Üretimi büyüttük ve tazeliği korumak için oksijensiz paketleme teknolojisine geçtik.' },
+                { year: '2026', title: 'Bugün', desc: '50.000’den fazla sporcuya ulaştık; aynı titizlikle üretmeye devam ediyoruz.' },
+            ],
+        },
+        certifications: {
+            title: 'Sertifikalarımız',
+            items: [
+                { label: 'ISO 22000', desc: 'Gıda güvenliği yönetim sistemi sertifikası' },
+                { label: 'HACCP', desc: 'Kritik kontrol noktalarında sürekli denetim' },
+                { label: 'Informed-Sport', desc: 'Doping maddesi içermediği bağımsız olarak test edildi' },
+                { label: 'GMP Uyumlu', desc: 'İyi üretim uygulamaları standartlarına tam uyum' },
+            ],
+        },
+        cta: {
+            title: 'Ürünlerimizi Keşfedin',
+            body: 'Laboratuvarımızda geliştirdiğimiz formülleri kendiniz deneyimleyin.',
+            button: 'Aromaları İncele',
+        },
+    },
+    help: {
+        hero: {
+            eyebrow: 'Yardım Merkezi',
+            title: 'Nasıl Yardımcı Olabiliriz?',
+            body: 'Kargo, iade, ödeme ve siparişlerinle ilgili en çok sorulan soruların cevapları burada. Aradığını bulamazsan bize ulaş.',
+        },
+        categories: [
+            {
+                title: 'Kargo & Teslimat',
+                items: [
+                    { q: 'Kargo ücreti ne kadar?', a: '250₺ ve üzeri siparişlerde kargo ücretsizdir; altındaki siparişlerde sabit 29.90₺ kargo ücreti uygulanır.' },
+                    { q: 'Siparişim ne zaman elime ulaşır?', a: 'Siparişler 1-3 iş günü içinde kargoya verilir, teslimat şehrinize göre genellikle 2-5 iş günü içinde tamamlanır.' },
+                    { q: 'Kargo takibimi nasıl yapabilirim?', a: 'Siparişin kargoya verildiğinde e-posta adresine bir takip numarası gönderilir; bu numarayla kargo firmasının sitesinden anlık takip yapabilirsin.' },
+                ],
+            },
+            {
+                title: 'İade & Değişim',
+                items: [
+                    { q: 'İade koşulları nelerdir?', a: 'Ürünü teslim aldığın tarihten itibaren 14 gün içinde, ambalajı açılmamış ürünlerde koşulsuz iade hakkın vardır.' },
+                    { q: 'Açılmış ürünü iade edebilir miyim?', a: 'Gıda güvenliği nedeniyle açılmış/kullanılmış ambalajlarda iade kabul edemiyoruz; üründen memnun kalmadıysan müşteri hizmetleriyle iletişime geç.' },
+                    { q: 'Para iadesi ne kadar sürede yapılır?', a: 'İade talebin onaylandıktan sonra tutar, kullandığın ödeme yöntemine 5-7 iş günü içinde yansır.' },
+                ],
+            },
+            {
+                title: 'Ödeme',
+                items: [
+                    { q: 'Hangi ödeme yöntemlerini kabul ediyorsunuz?', a: 'Tüm kredi ve banka kartlarıyla güvenli ödeme alıyoruz; kapıda ödeme seçeneği şu an mevcut değil.' },
+                    { q: 'Ödeme bilgilerim güvende mi?', a: 'Kart bilgilerin hiçbir zaman sunucularımızda saklanmaz; ödeme, sektör standardı şifreleme ile korunan bir altyapı üzerinden geçer.' },
+                    { q: 'Taksit seçeneği var mı?', a: '150₺ üzeri siparişlerde bankana bağlı olarak 3 aya kadar taksit imkânı sunuyoruz.' },
+                ],
+            },
+            {
+                title: 'Sipariş & Hesap',
+                items: [
+                    { q: 'Siparişimi nasıl iptal ederim?', a: 'Sipariş henüz kargoya verilmediyse müşteri hizmetlerimizle iletişime geçerek ücretsiz iptal edebilirsin.' },
+                    { q: 'Teslimat adresimi değiştirebilir miyim?', a: 'Kargoya verilmeden önce adres değişikliği yapılabilir; kargoya verildikten sonra kargo firmasıyla iletişime geçmen gerekir.' },
+                    { q: 'Toplu veya kurumsal sipariş verebilir miyim?', a: '10 adet ve üzeri siparişlerde özel fiyatlandırma sunuyoruz — iletişim sayfasından bize ulaşabilirsin.' },
+                ],
+            },
+        ],
+        cta: { text: 'Aradığını bulamadın mı?', linkText: 'Bize ulaş' },
+    },
     footer: {
         brandBlurb: 'Laboratuvar kalitesinde saf whey protein formülleri. Performansınız için tasarlandı, lezzetiniz için mükemmelleştirildi.',
         quickLinksTitle: 'Hızlı Bağlantılar',
         contactTitle: 'İletişim',
         followTitle: 'Bizi Takip Edin',
+        helpLinkLabel: 'Yardım Merkezi',
         socials: [{ label: 'Web sitemiz' }, { label: 'Bizi paylaşın' }, { label: 'Bize mesaj gönderin' }],
         copyright: (year) => `© ${year} PROTEIN3D. Tüm hakları saklıdır.`,
         tagline: 'Kas gelişiminiz için saf güç, saf lezzet.',
@@ -452,6 +577,7 @@ const en: Dictionary = {
     meta: { locale: 'en-US' },
     nav: {
         home: 'Home',
+        about: 'About',
         nutrition: 'Nutrition Science',
         contact: 'Contact',
         cartAriaWithItems: (count) => `Open cart, ${count} items inside`,
@@ -617,11 +743,98 @@ const en: Dictionary = {
             submit: 'Send',
         },
     },
+    about: {
+        hero: {
+            eyebrow: 'Our Story',
+            title: 'Born From a Passion for Strength',
+            body: "We started in a small lab back in 2011 with one goal: to make a whey protein athletes could actually trust. Today we're part of thousands of athletes' daily routines.",
+        },
+        story: {
+            title: 'How It Started',
+            paragraphs: [
+                "After years of coaching in the amateur bodybuilding community, our founder noticed that what was on the label rarely matched what was actually in the tub. PROTEIN3D was born from the idea of building an alternative to opaque, untested formulas — one that was independently verified from day one.",
+                "Today, every batch is independently tested across 200+ parameters before it ever leaves the production line. Our goal hasn't changed: what's on the label is exactly what's in the bottle.",
+            ],
+        },
+        values: [
+            { title: 'Scientific Rigor', desc: 'Every formula goes through extensive independent lab testing before it reaches the market.' },
+            { title: 'Full Transparency', desc: 'Every number on our label reflects real test results — no hidden fillers.' },
+            { title: 'Sustainable Sourcing', desc: 'We build an environmentally conscious supply chain from grass-fed farms.' },
+            { title: 'Athlete-First', desc: 'Every decision is made with the needs of real athletes on the ground in mind.' },
+        ],
+        timeline: {
+            eyebrow: 'Our Journey',
+            title: 'Milestones',
+            items: [
+                { year: '2011', title: 'Founded', desc: 'We started in a small lab with one flavor and one big goal.' },
+                { year: '2014', title: 'First Independent Certification', desc: 'Our formulas received their first independent doping-free certification.' },
+                { year: '2018', title: 'Facility Growth', desc: 'We scaled up production and moved to oxygen-free packaging to preserve freshness.' },
+                { year: '2026', title: 'Today', desc: "We've reached 50,000+ athletes — and we're still holding ourselves to the same standard." },
+            ],
+        },
+        certifications: {
+            title: 'Our Certifications',
+            items: [
+                { label: 'ISO 22000', desc: 'Food safety management system certification' },
+                { label: 'HACCP', desc: 'Continuous auditing at critical control points' },
+                { label: 'Informed-Sport', desc: 'Independently tested to be free of doping substances' },
+                { label: 'GMP Compliant', desc: 'Full compliance with good manufacturing practice standards' },
+            ],
+        },
+        cta: {
+            title: 'Explore Our Products',
+            body: 'Experience the formulas we developed in our own lab for yourself.',
+            button: 'Browse Flavors',
+        },
+    },
+    help: {
+        hero: {
+            eyebrow: 'Help Center',
+            title: 'How Can We Help?',
+            body: "Answers to the most common questions about shipping, returns, payment, and your orders. Can't find what you're looking for? Reach out to us.",
+        },
+        categories: [
+            {
+                title: 'Shipping & Delivery',
+                items: [
+                    { q: 'How much does shipping cost?', a: 'Shipping is free on orders over 250₺; orders below that have a flat 29.90₺ shipping fee.' },
+                    { q: 'When will my order arrive?', a: 'Orders ship within 1-3 business days and typically arrive within 2-5 business days depending on your city.' },
+                    { q: 'How can I track my order?', a: "You'll get a tracking number by email once your order ships, which you can use on the carrier's website for live tracking." },
+                ],
+            },
+            {
+                title: 'Returns & Exchanges',
+                items: [
+                    { q: "What's your return policy?", a: 'You have an unconditional right to return unopened products within 14 days of delivery.' },
+                    { q: 'Can I return an opened product?', a: "For food safety reasons we can't accept opened/used packaging — if you're not happy with a product, please contact customer support." },
+                    { q: 'How long do refunds take?', a: 'Once your return is approved, the amount is credited back to your original payment method within 5-7 business days.' },
+                ],
+            },
+            {
+                title: 'Payment',
+                items: [
+                    { q: 'What payment methods do you accept?', a: 'We accept secure payment via all major credit and debit cards; cash on delivery is not currently available.' },
+                    { q: 'Is my payment information secure?', a: 'Your card details are never stored on our servers — payments run through an infrastructure protected with industry-standard encryption.' },
+                    { q: 'Do you offer installment options?', a: 'On orders over 150₺, we offer up to 3 months of installments depending on your bank.' },
+                ],
+            },
+            {
+                title: 'Orders & Account',
+                items: [
+                    { q: 'How do I cancel my order?', a: "If your order hasn't shipped yet, contact our customer support and we'll cancel it free of charge." },
+                    { q: 'Can I change my shipping address?', a: "The address can be changed before the order ships; once it has shipped, you'll need to contact the carrier." },
+                    { q: 'Can I place a bulk or corporate order?', a: 'We offer special pricing for orders of 10+ units — reach out to us via the contact page.' },
+                ],
+            },
+        ],
+        cta: { text: "Can't find what you're looking for?", linkText: 'Contact us' },
+    },
     footer: {
         brandBlurb: 'Lab-quality pure whey protein formulas. Designed for your performance, perfected for your taste.',
         quickLinksTitle: 'Quick Links',
         contactTitle: 'Contact',
         followTitle: 'Follow Us',
+        helpLinkLabel: 'Help Center',
         socials: [{ label: 'Our website' }, { label: 'Share us' }, { label: 'Message us' }],
         copyright: (year) => `© ${year} PROTEIN3D. All rights reserved.`,
         tagline: 'Pure power, pure taste, for your muscle growth.',

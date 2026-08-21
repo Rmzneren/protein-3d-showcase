@@ -42,8 +42,10 @@ export function Footer() {
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <Link to="/" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.home}</Link>
+                        <Link to="/about" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.about}</Link>
                         <Link to="/nutrition" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.nutrition}</Link>
                         <Link to="/contact" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.nav.contact}</Link>
+                        <Link to="/help" style={{ color: '#8a8a8a', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}>{t.footer.helpLinkLabel}</Link>
                     </div>
                 </div>
 
